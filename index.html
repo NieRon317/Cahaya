@@ -1,305 +1,288 @@
-<!-- Header -->
-<header class="bg-indigo-600 text-white shadow-md">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold flex items-center gap-2">📦 Sistem Stok Cahaya</h1>
-        <button onclick="loadData()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded text-sm font-semibold transition shadow-sm">
-            🔄 Refresh Data
-        </button>
-    </div>
-</header>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Stok Cahaya</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h2, h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 8px;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-success {
+            background-color: #2ecc71;
+        }
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 120px;
+            gap: 12px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .grid-header {
+            font-weight: bold;
+            color: #555;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #status-message {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
 
-<!-- Main Container -->
-<main class="container mx-auto px-4 py-8 space-y-8">
+<div class="container">
+    <h2>📦 Sistem Manajemen Stok Cahaya</h2>
     
-    <!-- SECTION 1: INPUT BARANG MASUK (GRID STYLE) -->
-    <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div class="flex justify-between items-center mb-4 border-b pb-3">
-            <h2 class="text-lg font-bold text-slate-700">📝 Form Input Barang Masuk (Grid View)</h2>
-            <span class="text-xs bg-indigo-50 text-indigo-600 font-medium px-2.5 py-1 rounded">Mode Input Cepat</span>
-        </div>
-        
-        <form id="stokForm" onsubmit="handleSubmit(event)">
-            <!-- Excel-like Grid Container -->
-            <div class="overflow-x-auto border border-slate-300 rounded-lg">
-                <table class="min-w-full divide-y divide-slate-300 bg-white text-left text-sm">
-                    <thead class="bg-slate-100 text-slate-700 font-semibold uppercase text-xs">
-                        <tr>
-                            <th class="py-3 px-4 border-r border-slate-300 w-2/5">Nama Barang (Dropdown)</th>
-                            <th class="py-3 px-4 border-r border-slate-300 w-1/4">Jumlah Masuk</th>
-                            <th class="py-3 px-4 border-r border-slate-300 w-1/4">Harga Beli Satuan (Rp)</th>
-                            <th class="py-3 px-4 text-center w-24">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="gridBody" class="divide-y divide-slate-200">
-                        <!-- Row 1 Default -->
-                        <tr class="hover:bg-slate-50">
-                            <td class="p-2 border-r border-slate-200">
-                                <select name="nama_barang" required class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm dropdown-barang">
-                                    <option value="">-- Pilih Barang --</option>
-                                </select>
-                            </td>
-                            <td class="p-2 border-r border-slate-200">
-                                <input type="number" name="jumlah" required min="1" placeholder="0" 
-                                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                            </td>
-                            <td class="p-2 border-r border-slate-200">
-                                <input type="number" name="harga_satuan" required min="0" placeholder="0" 
-                                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                            </td>
-                            <td class="p-2 text-center">
-                                <button type="button" onclick="clearRow(this)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">Reset</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div style="margin-bottom: 20px;">
+        <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
+    </div>
+
+    <!-- Form Input Barang Masuk Grid View -->
+    <h3>📝 Form Input Barang Masuk (Grid View)</h3>
+    <form id="form-barang-masuk" onsubmit="submitData(event)">
+        <div class="grid-container">
+            <div class="grid-header">Nama Barang (Dropdown)</div>
+            <div class="grid-header">Jumlah Masuk</div>
+            <div class="grid-header">Harga Beli Satuan (Rp)</div>
+            <div class="grid-header">Aksi</div>
+
+            <!-- Baris Input 1 -->
+            <div>
+                <select id="nama_barang_0" required>
+                    <option value="">-- Memuat Data Barang --</option>
+                </select>
             </div>
-
-            <div class="mt-4 flex justify-between items-center">
-                <button type="button" onclick="addRow()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold px-4 py-2 rounded transition">
-                    + Tambah Baris Grid
-                </button>
-                <button type="submit" id="btnSubmit" 
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded shadow-sm transition">
-                    Simpan Semua Barang Masuk
-                </button>
+            <div>
+                <input type="number" id="jumlah_0" min="1" value="1" required>
             </div>
-        </form>
-        <div id="statusMessage" class="mt-4 text-center text-sm font-medium"></div>
-    </section>
-
-    <!-- SECTION 2: VIEW STOK (TABEL STOK) -->
-    <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <h2 class="text-lg font-bold text-slate-700 mb-4 border-b pb-2">📊 Daftar Master Stok Gudang</h2>
-        
-        <div class="overflow-x-auto border border-slate-200 rounded-lg">
-            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
-                    <tr>
-                        <th class="py-3 px-4 font-semibold">SKU / ID</th>
-                        <th class="py-3 px-4 font-semibold">Nama Barang</th>
-                        <th class="py-3 px-4 font-semibold">Kategori</th>
-                        <th class="py-3 px-4 text-center font-semibold">Stok Tersedia</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelStok" class="divide-y divide-slate-200 text-slate-600">
-                    <tr>
-                        <td colspan="4" class="text-center py-6 text-slate-400">Memuat data dari Google Sheets...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div>
+                <input type="number" id="harga_0" min="0" value="0" required>
+            </div>
+            <div>
+                <button type="button" class="btn" style="background-color: #e74c3c; padding: 10px;" onclick="resetForm()">Reset</button>
+            </div>
         </div>
-    </section>
 
-</main>
+        <button type="submit" class="btn btn-success">💾 Simpan Barang Masuk</button>
+    </form>
 
-<!-- JavaScript Integrasi -->
+    <div id="status-message"></div>
+
+    <!-- Daftar Master Stok -->
+    <h3>📊 Daftar Master Stok Gudang</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>SKU / ID</th>
+                <th>Nama Barang</th>
+                <th>Kategori</th>
+                <th>Stok Tersedia</th>
+            </tr>
+        </thead>
+        <tbody id="tabel-stok-body">
+            <tr>
+                <td colspan="4" style="text-align: center;">Menghubungkan ke database Google Sheets...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 <script>
     // ⚠️ MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
-                    
-    let masterBarangList = [];
 
-    // Fungsi Load Data & Daftar Dropdown
-async function loadData() {
-    try {
-        // Menggunakan mode cors dengan penanganan error yang bersih
-        let response = await fetch(SCRIPT_URL, {
-            method: "GET",
-            mode: "cors",
-            redirect: "follow"
-        });
-        
-        let result = await response.json();
-        
-        if (result.status === "success") {
-            // Mengisi Dropdown Nama Barang
-            let selectBarang = document.getElementById("nama_barang_0");
-            if (selectBarang) {
-                selectBarang.innerHTML = '<option value="">-- Pilih Barang --</option>';
-                result.listBarang.forEach(item => {
-                    let opt = document.createElement("option");
-                    opt.value = item.nama_barang;
-                    opt.textContent = item.nama_barang + " (SKU: " + item.sku + ")";
-                    opt.dataset.sku = item.sku;
-                    selectBarang.appendChild(opt);
-                });
-            }
+    async function loadData() {
+        let tbodyStok = document.getElementById("tabel-stok-body");
+        tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align: center;">Memuat data...</td></tr>';
+
+        try {
+            // Menggunakan mode no-cors jika cors standar terblokir cache browser
+            let response = await fetch(SCRIPT_URL);
+            let result = await response.json();
             
-            // Mengisi Tabel Master Stok
-            let tbodyStok = document.getElementById("tabel-stok-body");
-            if (tbodyStok) {
+            if (result.status === "success") {
+                // 1. Isi Dropdown Nama Barang
+                let selectBarang = document.getElementById("nama_barang_0");
+                selectBarang.innerHTML = '<option value="">-- Pilih Barang --</option>';
+                
+                if (result.listBarang && result.listBarang.length > 0) {
+                    result.listBarang.forEach(item => {
+                        let opt = document.createElement("option");
+                        opt.value = item.nama_barang;
+                        opt.textContent = `${item.nama_barang} (SKU: ${item.sku})`;
+                        opt.dataset.sku = item.sku;
+                        selectBarang.appendChild(opt);
+                    });
+                } else {
+                    selectBarang.innerHTML = '<option value="">Tidak ada data master barang</option>';
+                }
+                
+                // 2. Isi Tabel Master Stok
                 tbodyStok.innerHTML = "";
-                if (result.dataStok.length === 0) {
-                    tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada data stok.</td></tr>';
+                if (!result.dataStok || result.dataStok.length === 0) {
+                    tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
                 } else {
                     result.dataStok.forEach(row => {
                         let tr = document.createElement("tr");
                         tr.innerHTML = `
-                            <td>${row.sku}</td>
-                            <td>${row.nama_barang}</td>
-                            <td>${row.kategori}</td>
-                            <td><strong>${row.stok}</strong></td>
+                            <td>${row.sku || '-'}</td>
+                            <td>${row.nama_barang || '-'}</td>
+                            <td>${row.kategori || '-'}</td>
+                            <td><strong>${row.stok || 0}</strong></td>
                         `;
                         tbodyStok.appendChild(tr);
                     });
                 }
+            } else {
+                showStatus("Gagal memuat data dari server.", "error");
             }
-        } else {
-            console.error("Gagal memuat data dari server.");
-        }
-    } catch (error) {
-        console.error("Kesalahan Koneksi:", error);
-        // Fallback jika diblokir browser, tampilkan indikator petunjuk
-        let tbodyStok = document.getElementById("tabel-stok-body");
-        if (tbodyStok) {
-            tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data. Pastikan Web App sudah di-deploy dengan akses "Anyone".</td></tr>';
-        }
-    }
-}
-
-// Jalankan saat halaman dimuat
-window.onload = function() {
-    loadData();
-};
-
-    // Isi semua dropdown nama barang dari master data
-    function populateDropdowns() {
-        const dropdowns = document.querySelectorAll('.dropdown-barang');
-        dropdowns.forEach(select => {
-            const currentVal = select.value;
-            let options = `<option value="">-- Pilih Barang --</option>`;
-            masterBarangList.forEach(nama => {
-                options += `<option value="${nama}">${nama}</option>`;
-            });
-            select.innerHTML = options;
-            select.value = currentVal;
-        });
-    }
-
-    // Tambah baris baru pada grid Excel
-    function addRow() {
-        const tbody = document.getElementById('gridBody');
-        const newRow = document.createElement('tr');
-        newRow.className = "hover:bg-slate-50";
-        newRow.innerHTML = `
-            <td class="p-2 border-r border-slate-200">
-                <select name="nama_barang" required class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm dropdown-barang">
-                    <option value="">-- Pilih Barang --</option>
-                </select>
-            </td>
-            <td class="p-2 border-r border-slate-200">
-                <input type="number" name="jumlah" required min="1" placeholder="0" 
-                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-            </td>
-            <td class="p-2 border-r border-slate-200">
-                <input type="number" name="harga_satuan" required min="0" placeholder="0" 
-                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-            </td>
-            <td class="p-2 text-center">
-                <button type="button" onclick="clearRow(this)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">Reset</button>
-            </td>
-        `;
-        tbody.appendChild(newRow);
-        populateDropdowns();
-    }
-
-    // Reset isi baris grid
-    function clearRow(btn) {
-        const row = btn.closest('tr');
-        const tbody = document.getElementById('gridBody');
-        if (tbody.rows.length > 1) {
-            row.remove();
-        } else {
-            row.querySelector('select').value = "";
-            row.querySelectorAll('input').forEach(input => input.value = "");
+        } catch (error) {
+            console.error("Error:", error);
+            tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Gagal terhubung. Pastikan Web App diset "Anyone" pada saat Deploy.</td></tr>';
         }
     }
 
-    // Submit Data Massal Grid ke Backend
-    async function handleSubmit(event) {
+    async function submitData(event) {
         event.preventDefault();
-        const btn = document.getElementById('btnSubmit');
-        const msg = document.getElementById('statusMessage');
         
-        btn.disabled = true;
-        btn.innerText = "Menyimpan Data...";
-        msg.innerText = "";
-
-        // Kumpulkan semua baris data dari grid
-        const rows = document.querySelectorAll('#gridBody tr');
-        const items = [];
-
-        rows.forEach(row => {
-            const nama = row.querySelector('[name="nama_barang"]').value;
-            const jumlah = row.querySelector('[name="jumlah"]').value;
-            const harga = row.querySelector('[name="harga_satuan"]').value;
-            
-            if (nama && jumlah) {
-                items.push({
-                    nama_barang: nama,
-                    jumlah: parseInt(jumlah),
-                    harga_satuan: parseFloat(harga) || 0
-                });
-            }
-        });
-
-        if (items.length === 0) {
-            alert("Harap isi setidaknya satu baris data barang masuk.");
-            btn.disabled = false;
-            btn.innerText = "Simpan Semua Barang Masuk";
+        let namaBarang = document.getElementById("nama_barang_0").value;
+        let jumlah = parseInt(document.getElementById("jumlah_0").value);
+        let harga = parseFloat(document.getElementById("harga_0").value);
+        
+        if (!namaBarang) {
+            alert("Silakan pilih nama barang terlebih dahulu!");
             return;
         }
 
+        // Ambil SKU dari option yang dipilih
+        let selectElement = document.getElementById("nama_barang_0");
+        let selectedOption = selectElement.options[selectElement.selectedIndex];
+        let sku = selectedOption.dataset.sku || "";
+
+        let payload = {
+            items: [
+                {
+                    sku: sku,
+                    nama_barang: namaBarang,
+                    jumlah: jumlah,
+                    harga: harga
+                }
+            ]
+        };
+
+        showStatus("Sedang mengirim data ke Google Sheets...", "success");
+
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    tipe: "masuk_grid",
-                    items: items
-                })
+            let response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
             });
-            
-            const result = await response.json();
+            let result = await response.json();
+
             if (result.status === "success") {
-                msg.className = "mt-4 text-center text-sm font-medium text-emerald-600";
-                msg.innerText = "✅ Berhasil menyimpan semua data barang masuk!";
-                
-                // Reset grid ke 1 baris kosong
-                document.getElementById('gridBody').innerHTML = `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-2 border-r border-slate-200">
-                            <select name="nama_barang" required class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm dropdown-barang">
-                                <option value="">-- Pilih Barang --</option>
-                            </select>
-                        </td>
-                        <td class="p-2 border-r border-slate-200">
-                            <input type="number" name="jumlah" required min="1" placeholder="0" 
-                                class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                        </td>
-                        <td class="p-2 border-r border-slate-200">
-                            <input type="number" name="harga_satuan" required min="0" placeholder="0" 
-                                class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
-                        </td>
-                        <td class="p-2 text-center">
-                            <button type="button" onclick="clearRow(this)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">Reset</button>
-                        </td>
-                    </tr>
-                `;
-                populateDropdowns();
-                loadData(); // Refresh data tabel stok
+                showStatus("Data Barang Masuk berhasil disimpan!", "success");
+                resetForm();
+                loadData(); // Refresh data otomatis
             } else {
-                throw new Error(result.message || "Gagal menyimpan");
+                showStatus("Gagal menyimpan: " + result.message, "error");
             }
         } catch (error) {
-            console.error(error);
-            msg.className = "mt-4 text-center text-sm font-medium text-red-600";
-            msg.innerText = "❌ Terjadi kesalahan saat menyimpan data.";
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Simpan Semua Barang Masuk";
+            console.error("Error:", error);
+            showStatus("Terjadi kesalahan jaringan saat menyimpan data.", "error");
         }
     }
 
-    // Jalankan saat halaman dibuka
-    window.onload = loadData;
+    function resetForm() {
+        document.getElementById("nama_barang_0").selectedIndex = 0;
+        document.getElementById("jumlah_0").value = 1;
+        document.getElementById("harga_0").value = 0;
+    }
+
+    function showStatus(message, type) {
+        let msgDiv = document.getElementById("status-message");
+        msgDiv.style.display = "block";
+        msgDiv.className = type === "success" ? "alert-success" : "alert-error";
+        msgDiv.textContent = message;
+        
+        setTimeout(() => {
+            msgDiv.style.display = "none";
+        }, 4000);
+    }
+
+    // Jalankan saat halaman pertama kali dibuka
+    window.onload = function() {
+        loadData();
+    };
 </script>
+
+</body>
+</html>
