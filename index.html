@@ -100,42 +100,67 @@
     let masterBarangList = [];
 
     // Fungsi Load Data & Daftar Dropdown
-    async function loadData() {
-        const tabelBody = document.getElementById('tabelStok');
-        try {
-            tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-400">Memuat data...</td></tr>`;
+async function loadData() {
+    try {
+        // Menggunakan mode cors dengan penanganan error yang bersih
+        let response = await fetch(SCRIPT_URL, {
+            method: "GET",
+            mode: "cors",
+            redirect: "follow"
+        });
+        
+        let result = await response.json();
+        
+        if (result.status === "success") {
+            // Mengisi Dropdown Nama Barang
+            let selectBarang = document.getElementById("nama_barang_0");
+            if (selectBarang) {
+                selectBarang.innerHTML = '<option value="">-- Pilih Barang --</option>';
+                result.listBarang.forEach(item => {
+                    let opt = document.createElement("option");
+                    opt.value = item.nama_barang;
+                    opt.textContent = item.nama_barang + " (SKU: " + item.sku + ")";
+                    opt.dataset.sku = item.sku;
+                    selectBarang.appendChild(opt);
+                });
+            }
             
-            const response = await fetch(SCRIPT_URL);
-            const result = await response.json();
-
-            if (result.status === "success") {
-                masterBarangList = result.master_barang || [];
-                populateDropdowns();
-
-                let rows = "";
-                if (result.data.length === 0) {
-                    rows = `<tr><td colspan="4" class="text-center py-6 text-slate-400">Belum ada data stok.</td></tr>`;
+            // Mengisi Tabel Master Stok
+            let tbodyStok = document.getElementById("tabel-stok-body");
+            if (tbodyStok) {
+                tbodyStok.innerHTML = "";
+                if (result.dataStok.length === 0) {
+                    tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada data stok.</td></tr>';
                 } else {
-                    result.data.forEach(item => {
-                        rows += `
-                            <tr class="hover:bg-slate-50">
-                                <td class="py-3 px-4 font-mono text-xs">${item.id_barang || '-'}</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">${item.nama_barang}</td>
-                                <td class="py-3 px-4 text-xs text-slate-500">${item.kategori || '-'}</td>
-                                <td class="py-3 px-4 text-center font-bold text-indigo-600">${item.stok}</td>
-                            </tr>
+                    result.dataStok.forEach(row => {
+                        let tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${row.sku}</td>
+                            <td>${row.nama_barang}</td>
+                            <td>${row.kategori}</td>
+                            <td><strong>${row.stok}</strong></td>
                         `;
+                        tbodyStok.appendChild(tr);
                     });
                 }
-                tabelBody.innerHTML = rows;
-            } else {
-                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-red-500">Gagal memuat data dari server.</td></tr>`;
             }
-        } catch (error) {
-            console.error(error);
-            tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-red-500">Terjadi kesalahan koneksi.</td></tr>`;
+        } else {
+            console.error("Gagal memuat data dari server.");
+        }
+    } catch (error) {
+        console.error("Kesalahan Koneksi:", error);
+        // Fallback jika diblokir browser, tampilkan indikator petunjuk
+        let tbodyStok = document.getElementById("tabel-stok-body");
+        if (tbodyStok) {
+            tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat data. Pastikan Web App sudah di-deploy dengan akses "Anyone".</td></tr>';
         }
     }
+}
+
+// Jalankan saat halaman dimuat
+window.onload = function() {
+    loadData();
+};
 
     // Isi semua dropdown nama barang dari master data
     function populateDropdowns() {
