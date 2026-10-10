@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Stok - Google Sheets</title>
+    <!-- Tailwind CSS untuk styling cepat dan modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold">📦 Aplikasi Stok Barang</h1>
+            <button onclick="loadData()" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-sm font-semibold transition">
+                🔄 Refresh Data
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- KOLOM KIRI: Form Input / Update Stok -->
+        <section class="bg-white p-6 rounded-lg shadow-md lg:col-span-1">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Input / Update Stok</h2>
+            
+            <form id="stokForm" onsubmit="handleSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">ID Barang / SKU</label>
+                    <input type="text" id="id_barang" required placeholder="Contoh: BRG001" 
+                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nama Barang (Jika Baru)</label>
+                    <input type="text" id="nama_barang" placeholder="Contoh: Kopi Bubuk" 
+                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Tipe Transaksi</label>
+                    <select id="tipe" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="masuk">Stok Masuk / Tambah</option>
+                        <option value="keluar">Stok Keluar / Kurang</option>
+                        <option value="set">Set Stok (Timpa Nilai)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Jumlah</label>
+                    <input type="number" id="jumlah" required min="1" placeholder="Contoh: 10" 
+                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <button type="submit" id="btnSubmit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
+                    Simpan Data
+                </button>
+            </form>
+            <div id="statusMessage" class="mt-4 text-center text-sm font-medium"></div>
+        </section>
+
+        <!-- KOLOM KANAN: View Stok (Tabel) -->
+        <section class="bg-white p-6 rounded-lg shadow-md lg:col-span-2">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Daftar Stok Barang</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
+                            <th class="py-3 px-4 text-left border-b">ID Barang</th>
+                            <th class="py-3 px-4 text-left border-b">Nama Barang</th>
+                            <th class="py-3 px-4 text-center border-b">Stok</th>
+                            <th class="py-3 px-4 text-left border-b">Terakhir Update</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelStok" class="text-gray-600 text-sm font-light">
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-gray-400">Memuat data dari Google Sheets...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript untuk Integrasi -->
+    <script>
+        // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA NANTI
+        const SCRIPT_URL = "URL_WEB_APP_GOOGLE_APPS_SCRIPT_ANDA_DISINI";
+
+        // Fungsi untuk mengambil data (View)
+        async function loadData() {
+            const tabelBody = document.getElementById('tabelStok');
+            if (SCRIPT_URL === "URL_WEB_APP_GOOGLE_APPS_SCRIPT_ANDA_DISINI") {
+                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Harap atur SCRIPT_URL terlebih dahulu di kode JavaScript!</td></tr>`;
+                return;
+            }
+
+            try {
+                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">Memuat data...</td></tr>`;
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    let rows = "";
+                    if (result.data.length === 0) {
+                        rows = `<tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada data barang.</td></tr>`;
+                    } else {
+                        result.data.forEach(item => {
+                            rows += `
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-left font-medium">${item.id_barang}</td>
+                                    <td class="py-3 px-4 text-left">${item.nama_barang}</td>
+                                    <td class="py-3 px-4 text-center font-bold text-blue-600">${item.stok}</td>
+                                    <td class="py-3 px-4 text-left text-xs text-gray-400">${item.terakhir_update || '-'}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    tabelBody.innerHTML = rows;
+                } else {
+                    tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat data dari server.</td></tr>`;
+                }
+            } catch (error) {
+                console.error(error);
+                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Terjadi kesalahan koneksi.</td></tr>`;
+            }
+        }
+
+        // Fungsi untuk mengirim data (Input / Update)
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            if (SCRIPT_URL === "URL_WEB_APP_GOOGLE_APPS_SCRIPT_ANDA_DISINI") {
+                alert("Harap atur SCRIPT_URL terlebih dahulu!");
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmit');
+            const msg = document.getElementById('statusMessage');
+            
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
+            msg.innerText = "";
+
+            const payload = {
+                id_barang: document.getElementById('id_barang').value,
+                nama_barang: document.getElementById('nama_barang').value,
+                tipe: document.getElementById('tipe').value,
+                jumlah: parseInt(document.getElementById('jumlah').value)
+            };
+
+            try {
+                // Menggunakan mode 'no-cors' atau POST biasa tergantung setelan Google Apps Script
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if (result.status === "success") {
+                    msg.className = "mt-4 text-center text-sm font-medium text-green-600";
+                    msg.innerText = "Berhasil menyimpan stok!";
+                    document.getElementById('stokForm').reset();
+                    loadData(); // Refresh tabel
+                } else {
+                    throw new Error(result.message || "Gagal menyimpan");
+                }
+            } catch (error) {
+                console.error(error);
+                msg.className = "mt-4 text-center text-sm font-medium text-red-600";
+                msg.innerText = "Gagal menyimpan data. Cek koneksi / script.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan Data";
+            }
+        }
+
+        // Jalankan saat halaman pertama kali dibuka
+        window.onload = loadData;
+    </script>
+</body>
+</html>
