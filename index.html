@@ -1,187 +1,280 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Stok - Google Sheets</title>
-    <!-- Tailwind CSS untuk styling cepat dan modern -->
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<!-- Header -->
+<header class="bg-indigo-600 text-white shadow-md">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold flex items-center gap-2">📦 Sistem Stok Cahaya</h1>
+        <button onclick="loadData()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded text-sm font-semibold transition shadow-sm">
+            🔄 Refresh Data
+        </button>
+    </div>
+</header>
 
-    <!-- Header -->
-    <header class="bg-blue-600 text-white shadow-md">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold">📦 Aplikasi Stok Barang</h1>
-            <button onclick="loadData()" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded text-sm font-semibold transition">
-                🔄 Refresh Data
-            </button>
+<!-- Main Container -->
+<main class="container mx-auto px-4 py-8 space-y-8">
+    
+    <!-- SECTION 1: INPUT BARANG MASUK (GRID STYLE) -->
+    <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-4 border-b pb-3">
+            <h2 class="text-lg font-bold text-slate-700">📝 Form Input Barang Masuk (Grid View)</h2>
+            <span class="text-xs bg-indigo-50 text-indigo-600 font-medium px-2.5 py-1 rounded">Mode Input Cepat</span>
         </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="container mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- KOLOM KIRI: Form Input / Update Stok -->
-        <section class="bg-white p-6 rounded-lg shadow-md lg:col-span-1">
-            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Input / Update Stok</h2>
-            
-            <form id="stokForm" onsubmit="handleSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">ID Barang / SKU</label>
-                    <input type="text" id="id_barang" required placeholder="Contoh: BRG001" 
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Nama Barang (Jika Baru)</label>
-                    <input type="text" id="nama_barang" placeholder="Contoh: Kopi Bubuk" 
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Tipe Transaksi</label>
-                    <select id="tipe" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="masuk">Stok Masuk / Tambah</option>
-                        <option value="keluar">Stok Keluar / Kurang</option>
-                        <option value="set">Set Stok (Timpa Nilai)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Jumlah</label>
-                    <input type="number" id="jumlah" required min="1" placeholder="Contoh: 10" 
-                        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <button type="submit" id="btnSubmit" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
-                    Simpan Data
-                </button>
-            </form>
-            <div id="statusMessage" class="mt-4 text-center text-sm font-medium"></div>
-        </section>
-
-        <!-- KOLOM KANAN: View Stok (Tabel) -->
-        <section class="bg-white p-6 rounded-lg shadow-md lg:col-span-2">
-            <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Daftar Stok Barang</h2>
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white border border-gray-200">
-                    <thead>
-                        <tr class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
-                            <th class="py-3 px-4 text-left border-b">ID Barang</th>
-                            <th class="py-3 px-4 text-left border-b">Nama Barang</th>
-                            <th class="py-3 px-4 text-center border-b">Stok</th>
-                            <th class="py-3 px-4 text-left border-b">Terakhir Update</th>
+        <form id="stokForm" onsubmit="handleSubmit(event)">
+            <!-- Excel-like Grid Container -->
+            <div class="overflow-x-auto border border-slate-300 rounded-lg">
+                <table class="min-w-full divide-y divide-slate-300 bg-white text-left text-sm">
+                    <thead class="bg-slate-100 text-slate-700 font-semibold uppercase text-xs">
+                        <tr>
+                            <th class="py-3 px-4 border-r border-slate-300 w-2/5">Nama Barang (Dropdown)</th>
+                            <th class="py-3 px-4 border-r border-slate-300 w-1/4">Jumlah Masuk</th>
+                            <th class="py-3 px-4 border-r border-slate-300 w-1/4">Harga Beli Satuan (Rp)</th>
+                            <th class="py-3 px-4 text-center w-24">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="tabelStok" class="text-gray-600 text-sm font-light">
-                        <tr>
-                            <td colspan="4" class="text-center py-4 text-gray-400">Memuat data dari Google Sheets...</td>
+                    <tbody id="gridBody" class="divide-y divide-slate-200">
+                        <!-- Row 1 Default -->
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2 border-r border-slate-200">
+                                <select name="nama_barang" required class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm dropdown-barang">
+                                    <option value="">-- Pilih Barang --</option>
+                                </select>
+                            </td>
+                            <td class="p-2 border-r border-slate-200">
+                                <input type="number" name="jumlah" required min="1" placeholder="0" 
+                                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            </td>
+                            <td class="p-2 border-r border-slate-200">
+                                <input type="number" name="harga_satuan" required min="0" placeholder="0" 
+                                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            </td>
+                            <td class="p-2 text-center">
+                                <button type="button" onclick="clearRow(this)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">Reset</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
 
-    </main>
+            <div class="mt-4 flex justify-between items-center">
+                <button type="button" onclick="addRow()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold px-4 py-2 rounded transition">
+                    + Tambah Baris Grid
+                </button>
+                <button type="submit" id="btnSubmit" 
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded shadow-sm transition">
+                    Simpan Semua Barang Masuk
+                </button>
+            </div>
+        </form>
+        <div id="statusMessage" class="mt-4 text-center text-sm font-medium"></div>
+    </section>
 
-    <!-- JavaScript untuk Integrasi -->
-    <script>
-        // ⚠️ GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA NANTI
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
+    <!-- SECTION 2: VIEW STOK (TABEL STOK) -->
+    <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-bold text-slate-700 mb-4 border-b pb-2">📊 Daftar Master Stok Gudang</h2>
+        
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
+                    <tr>
+                        <th class="py-3 px-4 font-semibold">SKU / ID</th>
+                        <th class="py-3 px-4 font-semibold">Nama Barang</th>
+                        <th class="py-3 px-4 font-semibold">Kategori</th>
+                        <th class="py-3 px-4 text-center font-semibold">Stok Tersedia</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelStok" class="divide-y divide-slate-200 text-slate-600">
+                    <tr>
+                        <td colspan="4" class="text-center py-6 text-slate-400">Memuat data dari Google Sheets...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-        // Fungsi untuk mengambil data (View)
-        async function loadData() {
-            const tabelBody = document.getElementById('tabelStok');
-            if (SCRIPT_URL === "URL_WEB_APP_GOOGLE_APPS_SCRIPT_ANDA_DISINI") {
-                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Harap atur SCRIPT_URL terlebih dahulu di kode JavaScript!</td></tr>`;
-                return;
-            }
+</main>
 
-            try {
-                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">Memuat data...</td></tr>`;
-                const response = await fetch(SCRIPT_URL);
-                const result = await response.json();
+<!-- JavaScript Integrasi -->
+<script>
+    // ⚠️ MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctn-sENGKak-6d5vxygaEpFOE2jCNomsKUfGjsgm-07Dv9H2ggc_oZRuhr0hVgAQ/exec";
 
-                if (result.status === "success") {
-                    let rows = "";
-                    if (result.data.length === 0) {
-                        rows = `<tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada data barang.</td></tr>`;
-                    } else {
-                        result.data.forEach(item => {
-                            rows += `
-                                <tr class="border-b hover:bg-gray-50">
-                                    <td class="py-3 px-4 text-left font-medium">${item.id_barang}</td>
-                                    <td class="py-3 px-4 text-left">${item.nama_barang}</td>
-                                    <td class="py-3 px-4 text-center font-bold text-blue-600">${item.stok}</td>
-                                    <td class="py-3 px-4 text-left text-xs text-gray-400">${item.terakhir_update || '-'}</td>
-                                </tr>
-                            `;
-                        });
-                    }
-                    tabelBody.innerHTML = rows;
+    let masterBarangList = [];
+
+    // Fungsi Load Data & Daftar Dropdown
+    async function loadData() {
+        const tabelBody = document.getElementById('tabelStok');
+        try {
+            tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-400">Memuat data...</td></tr>`;
+            
+            const response = await fetch(SCRIPT_URL);
+            const result = await response.json();
+
+            if (result.status === "success") {
+                masterBarangList = result.master_barang || [];
+                populateDropdowns();
+
+                let rows = "";
+                if (result.data.length === 0) {
+                    rows = `<tr><td colspan="4" class="text-center py-6 text-slate-400">Belum ada data stok.</td></tr>`;
                 } else {
-                    tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Gagal memuat data dari server.</td></tr>`;
+                    result.data.forEach(item => {
+                        rows += `
+                            <tr class="hover:bg-slate-50">
+                                <td class="py-3 px-4 font-mono text-xs">${item.id_barang || '-'}</td>
+                                <td class="py-3 px-4 font-medium text-slate-800">${item.nama_barang}</td>
+                                <td class="py-3 px-4 text-xs text-slate-500">${item.kategori || '-'}</td>
+                                <td class="py-3 px-4 text-center font-bold text-indigo-600">${item.stok}</td>
+                            </tr>
+                        `;
+                    });
                 }
-            } catch (error) {
-                console.error(error);
-                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-red-500">Terjadi kesalahan koneksi.</td></tr>`;
+                tabelBody.innerHTML = rows;
+            } else {
+                tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-red-500">Gagal memuat data dari server.</td></tr>`;
             }
+        } catch (error) {
+            console.error(error);
+            tabelBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-red-500">Terjadi kesalahan koneksi.</td></tr>`;
         }
+    }
 
-        // Fungsi untuk mengirim data (Input / Update)
-        async function handleSubmit(event) {
-            event.preventDefault();
+    // Isi semua dropdown nama barang dari master data
+    function populateDropdowns() {
+        const dropdowns = document.querySelectorAll('.dropdown-barang');
+        dropdowns.forEach(select => {
+            const currentVal = select.value;
+            let options = `<option value="">-- Pilih Barang --</option>`;
+            masterBarangList.forEach(nama => {
+                options += `<option value="${nama}">${nama}</option>`;
+            });
+            select.innerHTML = options;
+            select.value = currentVal;
+        });
+    }
+
+    // Tambah baris baru pada grid Excel
+    function addRow() {
+        const tbody = document.getElementById('gridBody');
+        const newRow = document.createElement('tr');
+        newRow.className = "hover:bg-slate-50";
+        newRow.innerHTML = `
+            <td class="p-2 border-r border-slate-200">
+                <select name="nama_barang" required class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm dropdown-barang">
+                    <option value="">-- Pilih Barang --</option>
+                </select>
+            </td>
+            <td class="p-2 border-r border-slate-200">
+                <input type="number" name="jumlah" required min="1" placeholder="0" 
+                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+            </td>
+            <td class="p-2 border-r border-slate-200">
+                <input type="number" name="harga_satuan" required min="0" placeholder="0" 
+                    class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+            </td>
+            <td class="p-2 text-center">
+                <button type="button" onclick="clearRow(this)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">Reset</button>
+            </td>
+        `;
+        tbody.appendChild(newRow);
+        populateDropdowns();
+    }
+
+    // Reset isi baris grid
+    function clearRow(btn) {
+        const row = btn.closest('tr');
+        const tbody = document.getElementById('gridBody');
+        if (tbody.rows.length > 1) {
+            row.remove();
+        } else {
+            row.querySelector('select').value = "";
+            row.querySelectorAll('input').forEach(input => input.value = "");
+        }
+    }
+
+    // Submit Data Massal Grid ke Backend
+    async function handleSubmit(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btnSubmit');
+        const msg = document.getElementById('statusMessage');
+        
+        btn.disabled = true;
+        btn.innerText = "Menyimpan Data...";
+        msg.innerText = "";
+
+        // Kumpulkan semua baris data dari grid
+        const rows = document.querySelectorAll('#gridBody tr');
+        const items = [];
+
+        rows.forEach(row => {
+            const nama = row.querySelector('[name="nama_barang"]').value;
+            const jumlah = row.querySelector('[name="jumlah"]').value;
+            const harga = row.querySelector('[name="harga_satuan"]').value;
             
-            if (SCRIPT_URL === "URL_WEB_APP_GOOGLE_APPS_SCRIPT_ANDA_DISINI") {
-                alert("Harap atur SCRIPT_URL terlebih dahulu!");
-                return;
-            }
-
-            const btn = document.getElementById('btnSubmit');
-            const msg = document.getElementById('statusMessage');
-            
-            btn.disabled = true;
-            btn.innerText = "Menyimpan...";
-            msg.innerText = "";
-
-            const payload = {
-                id_barang: document.getElementById('id_barang').value,
-                nama_barang: document.getElementById('nama_barang').value,
-                tipe: document.getElementById('tipe').value,
-                jumlah: parseInt(document.getElementById('jumlah').value)
-            };
-
-            try {
-                // Menggunakan mode 'no-cors' atau POST biasa tergantung setelan Google Apps Script
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
+            if (nama && jumlah) {
+                items.push({
+                    nama_barang: nama,
+                    jumlah: parseInt(jumlah),
+                    harga_satuan: parseFloat(harga) || 0
                 });
-                
-                const result = await response.json();
-                if (result.status === "success") {
-                    msg.className = "mt-4 text-center text-sm font-medium text-green-600";
-                    msg.innerText = "Berhasil menyimpan stok!";
-                    document.getElementById('stokForm').reset();
-                    loadData(); // Refresh tabel
-                } else {
-                    throw new Error(result.message || "Gagal menyimpan");
-                }
-            } catch (error) {
-                console.error(error);
-                msg.className = "mt-4 text-center text-sm font-medium text-red-600";
-                msg.innerText = "Gagal menyimpan data. Cek koneksi / script.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Simpan Data";
             }
+        });
+
+        if (items.length === 0) {
+            alert("Harap isi setidaknya satu baris data barang masuk.");
+            btn.disabled = false;
+            btn.innerText = "Simpan Semua Barang Masuk";
+            return;
         }
 
-        // Jalankan saat halaman pertama kali dibuka
-        window.onload = loadData;
-    </script>
-</body>
-</html>
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    tipe: "masuk_grid",
+                    items: items
+                })
+            });
+            
+            const result = await response.json();
+            if (result.status === "success") {
+                msg.className = "mt-4 text-center text-sm font-medium text-emerald-600";
+                msg.innerText = "✅ Berhasil menyimpan semua data barang masuk!";
+                
+                // Reset grid ke 1 baris kosong
+                document.getElementById('gridBody').innerHTML = `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2 border-r border-slate-200">
+                            <select name="nama_barang" required class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm dropdown-barang">
+                                <option value="">-- Pilih Barang --</option>
+                            </select>
+                        </td>
+                        <td class="p-2 border-r border-slate-200">
+                            <input type="number" name="jumlah" required min="1" placeholder="0" 
+                                class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </td>
+                        <td class="p-2 border-r border-slate-200">
+                            <input type="number" name="harga_satuan" required min="0" placeholder="0" 
+                                class="w-full bg-transparent px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </td>
+                        <td class="p-2 text-center">
+                            <button type="button" onclick="clearRow(this)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 rounded border border-red-200 hover:bg-red-50">Reset</button>
+                        </td>
+                    </tr>
+                `;
+                populateDropdowns();
+                loadData(); // Refresh data tabel stok
+            } else {
+                throw new Error(result.message || "Gagal menyimpan");
+            }
+        } catch (error) {
+            console.error(error);
+            msg.className = "mt-4 text-center text-sm font-medium text-red-600";
+            msg.innerText = "❌ Terjadi kesalahan saat menyimpan data.";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Simpan Semua Barang Masuk";
+        }
+    }
+
+    // Jalankan saat halaman dibuka
+    window.onload = loadData;
+</script>
