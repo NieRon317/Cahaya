@@ -293,69 +293,81 @@
         }
     }
 
-    function submitData(event) {
-        event.preventDefault();
-        
-        let namaToko = document.getElementById("nama_toko").value;
-        let tglInvoice = document.getElementById("tanggal_invoice").value;
-        let noInvoice = document.getElementById("nomor_invoice").value;
+async function submitData(event) {
+    event.preventDefault();
 
-        let itemRows = document.querySelectorAll(".item-row");
-        let items = [];
+    let namaToko = document.getElementById("nama_toko").value;
+    let tglInvoice = document.getElementById("tanggal_invoice").value;
+    let noInvoice = document.getElementById("nomor_invoice").value;
 
-        itemRows.forEach(row => {
-            let namaBarang = row.querySelector(".input-nama-barang").value;
-            let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
-            let hargaStr = row.querySelector(".input-harga").value;
+    let items = [];
+    document.querySelectorAll(".item-row").forEach(row => {
+        let namaBarang = row.querySelector(".input-nama-barang").value;
+        let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
+        let hargaStr = row.querySelector(".input-harga").value;
 
-            if (namaBarang && jumlah > 0) {
-                items.push({
-                    nama_barang: namaBarang,
-                    jumlah: jumlah,
-                    harga: hargaStr
-                });
-            }
+        if (namaBarang && jumlah > 0) {
+            items.push({ nama_barang: namaBarang, jumlah: jumlah, harga: hargaStr });
+        }
+    });
+
+    if (items.length === 0) {
+        alert("Harap isi setidaknya satu item barang dengan benar!");
+        return;
+    }
+
+    let payload = {
+        nama_toko: namaToko,
+        tanggal_invoice: tglInvoice,
+        nomor_invoice: noInvoice,
+        items: items
+    };
+
+    let btnSimpan = document.querySelector(".btn-success");
+    btnSimpan.disabled = true;
+    btnSimpan.textContent = "⏳ Menyimpan...";
+    showStatus("Menyimpan data invoice ke Google Sheets...", "success", 0);
+
+    try {
+        let response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
         });
 
-        if (items.length === 0) {
-            alert("Harap isi setidaknya satu item barang dengan benar!");
-            return;
-        }
+        let result = await response.json();
 
-        let payload = {
-            nama_toko: namaToko,
-            tanggal_invoice: tglInvoice,
-            nomor_invoice: noInvoice,
-            items: items
-        };
-
-        showStatus("Menyimpan data invoice ke Google Sheets...", "success");
-
-        // Kirim data menggunakan form tersembunyi ke iframe agar tembus pembatasan redirect Google Apps Script
-        let form = document.createElement("form");
-        form.method = "POST";
-        form.action = SCRIPT_URL;
-        form.target = "hidden_iframe";
-
-        let input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "data";
-        input.value = JSON.stringify(payload);
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-        form.remove();
-
-        // Beri jeda 1.5 detik lalu reset form & refresh data stok
-        setTimeout(() => {
-            showStatus("Data Barang Masuk berhasil disimpan ke Google Sheets!", "success");
+        if (result.status === "success") {
+            showStatus("✅ Data Barang Masuk berhasil disimpan ke Google Sheets!", "success");
             document.getElementById("form-barang-masuk").reset();
             document.getElementById("container-item-list").innerHTML = "";
             tambahBarisItem();
             loadData();
-        }, 1500);
+        } else {
+            showStatus("❌ Gagal menyimpan: " + result.message, "error");
+        }
+    } catch (error) {
+        console.error("Error simpan:", error);
+        showStatus("❌ Gagal terhubung ke server: " + error.message, "error");
+    } finally {
+        btnSimpan.disabled = false;
+        btnSimpan.textContent = "💾 Simpan Semua Barang Masuk";
     }
+}
+
+        function showStatus(message, type, duration = 4000) {
+    let msgDiv = document.getElementById("status-message");
+    msgDiv.style.display = "block";
+    msgDiv.className = type === "success" ? "alert-success" : "alert-error";
+    msgDiv.textContent = message;
+
+    clearTimeout(window._statusTimer);
+    if (duration > 0) {
+        window._statusTimer = setTimeout(() => {
+            msgDiv.style.display = "none";
+        }, duration);
+    }
+}
 
     function showStatus(message, type) {
         let msgDiv = document.getElementById("status-message");
