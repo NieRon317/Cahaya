@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Stok Cahaya</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h2, h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 8px;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #2980b9; }
+        .btn-success { background-color: #2ecc71; }
+        .btn-success:hover { background-color: #27ae60; }
+        .btn-danger { background-color: #e74c3c; padding: 8px 12px; }
+        .btn-danger:hover { background-color: #c0392b; }
+        .btn-warning { background-color: #f39c12; color: white; }
+        .btn-warning:hover { background-color: #d68910; }
+
+        /* Styling Header Invoice */
+        .invoice-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        /* Styling Grid Item Barang */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 80px;
+            gap: 10px;
+            align-items: center;
+            background: #fdfdfd;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 10px;
+        }
+        .grid-header {
+            font-weight: bold;
+            color: #555;
+            font-size: 13px;
+        }
+        input, select {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        #status-message {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📦 Sistem Manajemen Stok Cahaya</h2>
+    
+    <div style="margin-bottom: 20px;">
+        <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
+    </div>
+
+    <!-- Form Input Barang Masuk Multi-Item -->
+    <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
+    <form id="form-barang-masuk" onsubmit="submitData(event)">
+        
+        <!-- Informasi Nota / Invoice -->
+        <div class="invoice-header">
+            <div class="form-group">
+                <label>Nama Toko / Supplier</label>
+                <input type="text" id="nama_toko" placeholder="Contoh: Toko Berkah" required>
+            </div>
+            <div class="form-group">
+                <label>Tanggal Invoice</label>
+                <input type="date" id="tanggal_invoice" required>
+            </div>
+            <div class="form-group">
+                <label>Nomor Invoice</label>
+                <input type="text" id="nomor_invoice" placeholder="Contoh: INV/2026/001" required>
+            </div>
+        </div>
+
+        <!-- Daftar Baris Item Barang -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <label style="font-weight: bold; color: #333;">Daftar Item Barang Masuk:</label>
+            <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
+        </div>
+
+        <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
+            <div class="grid-header">Nama Barang (Dropdown)</div>
+            <div class="grid-header">Jumlah Masuk</div>
+            <div class="grid-header">Harga Beli Satuan (Rp)</div>
+            <div class="grid-header">Aksi</div>
+        </div>
+
+        <div id="container-item-list">
+            <!-- Baris Pertama (Dibuat otomatis oleh JS) -->
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button type="submit" class="btn btn-success" style="font-size: 16px; padding: 12px 24px;">💾 Simpan Semua Barang Masuk</button>
+        </div>
+    </form>
+
+    <div id="status-message"></div>
+
+    <!-- Daftar Master Stok -->
+    <h3>📊 Daftar Master Stok Gudang</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>SKU / ID</th>
+                <th>Nama Barang</th>
+                <th>Kategori</th>
+                <th>Stok Tersedia</th>
+            </tr>
+        </thead>
+        <tbody id="tabel-stok-body">
+            <tr>
+                <td colspan="4" style="text-align: center;">Memuat data dari Google Sheets...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // ⚠️ URL WEB APP GOOGLE APPS SCRIPT ANDA
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
+    
+    let globalListBarang = [];
+
+    async function loadData() {
+        let tbodyStok = document.getElementById("tabel-stok-body");
+        tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align: center;">Memuat data...</td></tr>';
+
+        try {
+            let response = await fetch(SCRIPT_URL);
+            let result = await response.json();
+            
+            if (result.status === "success") {
+                globalListBarang = result.listBarang || [];
+                
+                // Reset dan buat baris pertama form item
+                let container = document.getElementById("container-item-list");
+                container.innerHTML = "";
+                tambahBarisItem();
+
+                // Isi Tabel Master Stok
+                tbodyStok.innerHTML = "";
+                if (!result.dataStok || result.dataStok.length === 0) {
+                    tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
+                } else {
+                    result.dataStok.forEach(row => {
+                        let tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${row.sku || '-'}</td>
+                            <td>${row.nama_barang || '-'}</td>
+                            <td>${row.kategori || '-'}</td>
+                            <td><strong>${row.stok || 0}</strong></td>
+                        `;
+                        tbodyStok.appendChild(tr);
+                    });
+                }
+            } else {
+                showStatus("Gagal memuat data dari server.", "error");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
+        }
+    }
+
+    // Fungsi untuk menambah baris input barang dinamis
+    function tambahBarisItem() {
+        let container = document.getElementById("container-item-list");
+        let rowIndex = container.children.length;
+
+        let rowDiv = document.createElement("div");
+        rowDiv.className = "grid-container item-row";
+        rowDiv.style.marginBottom = "8px";
+
+        // Buat opsi dropdown dari data global
+        let optionsHtml = '<option value="">-- Pilih Barang --</option>';
+        globalListBarang.forEach(item => {
+            optionsHtml += `<option value="${item.nama_barang}" data-sku="${item.sku}">${item.nama_barang} (SKU: ${item.sku})</option>`;
+        });
+
+        rowDiv.innerHTML = `
+            <div>
+                <select class="input-nama-barang" required>
+                    ${optionsHtml}
+                </select>
+            </div>
+            <div>
+                <input type="number" class="input-jumlah" min="1" value="1" required>
+            </div>
+            <div>
+                <input type="number" class="input-harga" min="0" value="0" required>
+            </div>
+            <div>
+                <button type="button" class="btn btn-danger" onclick="hapusBarisItem(this)">Hapus</button>
+            </div>
+        `;
+
+        container.appendChild(rowDiv);
+    }
+
+    // Fungsi menghapus baris item (minimal menyisakan 1 baris)
+    function hapusBarisItem(button) {
+        let container = document.getElementById("container-item-list");
+        if (container.children.length > 1) {
+            button.closest(".item-row").remove();
+        } else {
+            alert("Minimal harus ada 1 item barang dalam transaksi!");
+        }
+    }
+
+    async function submitData(event) {
+        event.preventDefault();
+        
+        let namaToko = document.getElementById("nama_toko").value;
+        let tglInvoice = document.getElementById("tanggal_invoice").value;
+        let noInvoice = document.getElementById("nomor_invoice").value;
+
+        let itemRows = document.querySelectorAll(".item-row");
+        let items = [];
+
+        itemRows.forEach(row => {
+            let selectElem = row.querySelector(".input-nama-barang");
+            let selectedOption = selectElem.options[selectElem.selectedIndex];
+            
+            let namaBarang = selectElem.value;
+            let sku = selectedOption.dataset.sku || "";
+            let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
+            let harga = parseFloat(row.querySelector(".input-harga").value) || 0;
+
+            if (namaBarang && jumlah > 0) {
+                items.push({
+                    sku: sku,
+                    nama_barang: namaBarang,
+                    jumlah: jumlah,
+                    harga: harga
+                });
+            }
+        });
+
+        if (items.length === 0) {
+            alert("Harap isi setidaknya satu item barang dengan benar!");
+            return;
+        }
+
+        let payload = {
+            nama_toko: namaToko,
+            tanggal_invoice: tglInvoice,
+            nomor_invoice: noInvoice,
+            items: items
+        };
+
+        showStatus("Menyimpan data invoice ke Google Sheets...", "success");
+
+        try {
+            let response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            let result = await response.json();
+
+            if (result.status === "success") {
+                showStatus("Data Barang Masuk berhasil disimpan!", "success");
+                document.getElementById("form-barang-masuk").reset();
+                document.getElementById("container-item-list").innerHTML = "";
+                tambahBarisItem(); // Reset ke 1 baris kosong
+                loadData(); // Refresh data tabel stok
+            } else {
+                showStatus("Gagal menyimpan: " + result.message, "error");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            showStatus("Terjadi kesalahan jaringan saat menyimpan data.", "error");
+        }
+    }
+
+    function showStatus(message, type) {
+        let msgDiv = document.getElementById("status-message");
+        msgDiv.style.display = "block";
+        msgDiv.className = type === "success" ? "alert-success" : "alert-error";
+        msgDiv.textContent = message;
+        
+        setTimeout(() => {
+            msgDiv.style.display = "none";
+        }, 4000);
+    }
+
+    window.onload = function() {
+        loadData();
+    };
+</script>
+
+</body>
+</html>
