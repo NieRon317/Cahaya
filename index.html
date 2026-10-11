@@ -187,6 +187,9 @@
     </table>
 </div>
 
+<!-- Iframe tersembunyi untuk bypass redirect POST Google Apps Script -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
     let globalListBarang = [];
@@ -290,7 +293,7 @@
         }
     }
 
-    async function submitData(event) {
+    function submitData(event) {
         event.preventDefault();
         
         let namaToko = document.getElementById("nama_toko").value;
@@ -328,28 +331,30 @@
 
         showStatus("Menyimpan data invoice ke Google Sheets...", "success");
 
-        try {
-            await fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
+        // Kirim data menggunakan form tersembunyi ke iframe agar tembus pembatasan redirect Google Apps Script
+        let form = document.createElement("form");
+        form.method = "POST";
+        form.action = SCRIPT_URL;
+        form.target = "hidden_iframe";
 
-            setTimeout(() => {
-                showStatus("Data Barang Masuk berhasil disimpan ke Google Sheets!", "success");
-                document.getElementById("form-barang-masuk").reset();
-                document.getElementById("container-item-list").innerHTML = "";
-                tambahBarisItem();
-                loadData();
-            }, 1000);
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "data";
+        input.value = JSON.stringify(payload);
 
-        } catch (error) {
-            console.error("Error:", error);
-            showStatus("Terjadi kesalahan jaringan saat menyimpan data.", "error");
-        }
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+
+        // Beri jeda 1.5 detik lalu reset form & refresh data stok
+        setTimeout(() => {
+            showStatus("Data Barang Masuk berhasil disimpan ke Google Sheets!", "success");
+            document.getElementById("form-barang-masuk").reset();
+            document.getElementById("container-item-list").innerHTML = "";
+            tambahBarisItem();
+            loadData();
+        }, 1500);
     }
 
     function showStatus(message, type) {
