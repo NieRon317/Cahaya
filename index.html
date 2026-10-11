@@ -36,12 +36,22 @@
             transition: background 0.2s;
         }
         .btn:hover { background-color: #2980b9; }
-        .btn-success { background-color: #2ecc71; }
+        .btn-success { background-color: #2ecc71; font-size: 16px; padding: 12px 24px; }
         .btn-success:hover { background-color: #27ae60; }
         .btn-danger { background-color: #e74c3c; padding: 8px 12px; }
         .btn-danger:hover { background-color: #c0392b; }
         .btn-warning { background-color: #f39c12; color: white; }
         .btn-warning:hover { background-color: #d68910; }
+
+        /* Frame / Kotak Pembungkus Utama Form */
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #d1d8e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
 
         /* Styling Header Invoice */
         .invoice-header {
@@ -51,7 +61,7 @@
             background: #f8f9fa;
             padding: 15px;
             border-radius: 6px;
-            border: 1px solid #ddd;
+            border: 1px solid #e1e4e8;
             margin-bottom: 20px;
         }
         .form-group label {
@@ -123,47 +133,50 @@
         <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
     </div>
 
-    <!-- Form Input Barang Masuk Multi-Item -->
-    <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
-    <form id="form-barang-masuk" onsubmit="submitData(event)">
+    <!-- Form Input Dibungkus dalam 1 Frame (Card) -->
+    <div class="form-card">
+        <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
         
-        <!-- Informasi Nota / Invoice -->
-        <div class="invoice-header">
-            <div class="form-group">
-                <label>Nama Toko / Supplier</label>
-                <input type="text" id="nama_toko" placeholder="Contoh: Toko Berkah" required>
+        <form id="form-barang-masuk" onsubmit="submitData(event)">
+            
+            <!-- Informasi Nota / Invoice -->
+            <div class="invoice-header">
+                <div class="form-group">
+                    <label>Nama Toko / Supplier</label>
+                    <input type="text" id="nama_toko" placeholder="Contoh: Toko Berkah" required>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Invoice</label>
+                    <input type="date" id="tanggal_invoice" required>
+                </div>
+                <div class="form-group">
+                    <label>Nomor Invoice</label>
+                    <input type="text" id="nomor_invoice" placeholder="Contoh: INV/2026/001" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Tanggal Invoice</label>
-                <input type="date" id="tanggal_invoice" required>
+
+            <!-- Daftar Baris Item Barang -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="font-weight: bold; color: #333;">Daftar Item Barang Masuk:</label>
+                <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
             </div>
-            <div class="form-group">
-                <label>Nomor Invoice</label>
-                <input type="text" id="nomor_invoice" placeholder="Contoh: INV/2026/001" required>
+
+            <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
+                <div class="grid-header">Nama Barang (Dropdown)</div>
+                <div class="grid-header">Jumlah Masuk</div>
+                <div class="grid-header">Harga Beli Satuan (Rp)</div>
+                <div class="grid-header">Aksi</div>
             </div>
-        </div>
 
-        <!-- Daftar Baris Item Barang -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <label style="font-weight: bold; color: #333;">Daftar Item Barang Masuk:</label>
-            <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
-        </div>
+            <div id="container-item-list">
+                <!-- Baris Pertama -->
+            </div>
 
-        <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
-            <div class="grid-header">Nama Barang (Dropdown)</div>
-            <div class="grid-header">Jumlah Masuk</div>
-            <div class="grid-header">Harga Beli Satuan (Rp)</div>
-            <div class="grid-header">Aksi</div>
-        </div>
-
-        <div id="container-item-list">
-            <!-- Baris Pertama (Dibuat otomatis oleh JS) -->
-        </div>
-
-        <div style="margin-top: 20px;">
-            <button type="submit" class="btn btn-success" style="font-size: 16px; padding: 12px 24px;">💾 Simpan Semua Barang Masuk</button>
-        </div>
-    </form>
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
+            </div>
+        </form>
+    </div>
 
     <div id="status-message"></div>
 
@@ -187,9 +200,7 @@
 </div>
 
 <script>
-    // ⚠️ URL WEB APP GOOGLE APPS SCRIPT ANDA
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
-    
     let globalListBarang = [];
 
     async function loadData() {
@@ -203,12 +214,10 @@
             if (result.status === "success") {
                 globalListBarang = result.listBarang || [];
                 
-                // Reset dan buat baris pertama form item
                 let container = document.getElementById("container-item-list");
                 container.innerHTML = "";
                 tambahBarisItem();
 
-                // Isi Tabel Master Stok
                 tbodyStok.innerHTML = "";
                 if (!result.dataStok || result.dataStok.length === 0) {
                     tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
@@ -233,131 +242,17 @@
         }
     }
 
-    // Fungsi untuk menambah baris input barang dinamis
     function tambahBarisItem() {
         let container = document.getElementById("container-item-list");
-        let rowIndex = container.children.length;
 
         let rowDiv = document.createElement("div");
         rowDiv.className = "grid-container item-row";
         rowDiv.style.marginBottom = "8px";
 
-        // Buat opsi dropdown dari data global
         let optionsHtml = '<option value="">-- Pilih Barang --</option>';
         globalListBarang.forEach(item => {
-            optionsHtml += `<option value="${item.nama_barang}" data-sku="${item.sku}">${item.nama_barang} (SKU: ${item.sku})</option>`;
+            optionsHtml += `<option value="${item.nama_barang}" data-sku="${item.sku}">${item.nama_barang} (SKU:${item.sku})</option>`;
         });
 
         rowDiv.innerHTML = `
             <div>
-                <select class="input-nama-barang" required>
-                    ${optionsHtml}
-                </select>
-            </div>
-            <div>
-                <input type="number" class="input-jumlah" min="1" value="1" required>
-            </div>
-            <div>
-                <input type="number" class="input-harga" min="0" value="0" required>
-            </div>
-            <div>
-                <button type="button" class="btn btn-danger" onclick="hapusBarisItem(this)">Hapus</button>
-            </div>
-        `;
-
-        container.appendChild(rowDiv);
-    }
-
-    // Fungsi menghapus baris item (minimal menyisakan 1 baris)
-    function hapusBarisItem(button) {
-        let container = document.getElementById("container-item-list");
-        if (container.children.length > 1) {
-            button.closest(".item-row").remove();
-        } else {
-            alert("Minimal harus ada 1 item barang dalam transaksi!");
-        }
-    }
-
-    async function submitData(event) {
-        event.preventDefault();
-        
-        let namaToko = document.getElementById("nama_toko").value;
-        let tglInvoice = document.getElementById("tanggal_invoice").value;
-        let noInvoice = document.getElementById("nomor_invoice").value;
-
-        let itemRows = document.querySelectorAll(".item-row");
-        let items = [];
-
-        itemRows.forEach(row => {
-            let selectElem = row.querySelector(".input-nama-barang");
-            let selectedOption = selectElem.options[selectElem.selectedIndex];
-            
-            let namaBarang = selectElem.value;
-            let sku = selectedOption.dataset.sku || "";
-            let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
-            let harga = parseFloat(row.querySelector(".input-harga").value) || 0;
-
-            if (namaBarang && jumlah > 0) {
-                items.push({
-                    sku: sku,
-                    nama_barang: namaBarang,
-                    jumlah: jumlah,
-                    harga: harga
-                });
-            }
-        });
-
-        if (items.length === 0) {
-            alert("Harap isi setidaknya satu item barang dengan benar!");
-            return;
-        }
-
-        let payload = {
-            nama_toko: namaToko,
-            tanggal_invoice: tglInvoice,
-            nomor_invoice: noInvoice,
-            items: items
-        };
-
-        showStatus("Menyimpan data invoice ke Google Sheets...", "success");
-
-        try {
-            let response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-            let result = await response.json();
-
-            if (result.status === "success") {
-                showStatus("Data Barang Masuk berhasil disimpan!", "success");
-                document.getElementById("form-barang-masuk").reset();
-                document.getElementById("container-item-list").innerHTML = "";
-                tambahBarisItem(); // Reset ke 1 baris kosong
-                loadData(); // Refresh data tabel stok
-            } else {
-                showStatus("Gagal menyimpan: " + result.message, "error");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            showStatus("Terjadi kesalahan jaringan saat menyimpan data.", "error");
-        }
-    }
-
-    function showStatus(message, type) {
-        let msgDiv = document.getElementById("status-message");
-        msgDiv.style.display = "block";
-        msgDiv.className = type === "success" ? "alert-success" : "alert-error";
-        msgDiv.textContent = message;
-        
-        setTimeout(() => {
-            msgDiv.style.display = "none";
-        }, 4000);
-    }
-
-    window.onload = function() {
-        loadData();
-    };
-</script>
-
-</body>
-</html>
