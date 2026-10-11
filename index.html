@@ -43,7 +43,6 @@
         .btn-warning { background-color: #f39c12; color: white; }
         .btn-warning:hover { background-color: #d68910; }
 
-        /* Frame / Kotak Pembungkus Utama Form */
         .form-card {
             background: #ffffff;
             border: 1px solid #d1d8e0;
@@ -52,8 +51,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
             margin-bottom: 20px;
         }
-
-        /* Styling Header Invoice */
         .invoice-header {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -71,8 +68,6 @@
             color: #555;
             margin-bottom: 5px;
         }
-
-        /* Styling Grid Item Barang */
         .grid-container {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 80px;
@@ -133,13 +128,11 @@
         <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
     </div>
 
-    <!-- Form Input Dibungkus dalam 1 Frame (Card) -->
     <div class="form-card">
         <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
         
         <form id="form-barang-masuk" onsubmit="submitData(event)">
             
-            <!-- Informasi Nota / Invoice -->
             <div class="invoice-header">
                 <div class="form-group">
                     <label>Nama Toko / Supplier</label>
@@ -155,7 +148,6 @@
                 </div>
             </div>
 
-            <!-- Daftar Baris Item Barang -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <label style="font-weight: bold; color: #333;">Daftar Item Barang Masuk:</label>
                 <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
@@ -168,9 +160,7 @@
                 <div class="grid-header">Aksi</div>
             </div>
 
-            <div id="container-item-list">
-                <!-- Baris Pertama akan diisi otomatis setelah data siap -->
-            </div>
+            <div id="container-item-list"></div>
 
             <div style="margin-top: 20px;">
                 <button type="submit" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
@@ -180,7 +170,6 @@
 
     <div id="status-message"></div>
 
-    <!-- Daftar Master Stok -->
     <h3>📊 Daftar Master Stok Gudang</h3>
     <table>
         <thead>
@@ -212,15 +201,12 @@
             let result = await response.json();
             
             if (result.status === "success") {
-                // Simpan list barang ke variabel global
                 globalListBarang = result.listBarang || [];
                 
-                // Kosongkan dan buat baris pertama item barang
                 let container = document.getElementById("container-item-list");
                 container.innerHTML = "";
                 tambahBarisItem();
 
-                // Isi Tabel Master Stok
                 tbodyStok.innerHTML = "";
                 if (!result.dataStok || result.dataStok.length === 0) {
                     tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
@@ -252,14 +238,14 @@
         rowDiv.className = "grid-container item-row";
         rowDiv.style.marginBottom = "8px";
 
-        // Buat opsi dropdown berdasarkan globalListBarang yang sudah dimuat
-        let optionsHtml = '<option value="">-- Pilih Barang --</option>';
+        // Dropdown hanya menampilkan Nama Barang saja tanpa SKU
+        let optionsHtml = '<option value="">-- Pilih Nama Barang --</option>';
         if (globalListBarang.length > 0) {
             globalListBarang.forEach(item => {
-                optionsHtml += `<option value="${item.nama_barang}" data-sku="${item.sku}">${item.nama_barang} (SKU: ${item.sku})</option>`;
+                optionsHtml += `<option value="${item.nama_barang}">${item.nama_barang}</option>`;
             });
         } else {
-            optionsHtml += '<option value="" disabled>Data barang kosong / belum dimuat</option>';
+            optionsHtml += '<option value="" disabled>Data barang kosong</option>';
         }
 
         rowDiv.innerHTML = `
@@ -272,7 +258,7 @@
                 <input type="number" class="input-jumlah" min="1" value="1" required>
             </div>
             <div>
-                <input type="number" class="input-harga" min="0" value="0" required>
+                <input type="text" class="input-harga" value="0" onkeyup="formatRupiah(this)" required>
             </div>
             <div>
                 <button type="button" class="btn btn-danger" onclick="hapusBarisItem(this)">Hapus</button>
@@ -280,6 +266,23 @@
         `;
 
         container.appendChild(rowDiv);
+    }
+
+    // Fungsi otomatis format titik ribuan pada harga (misal: 1000 jadi 1.000)
+    function formatRupiah(input) {
+        let value = input.value.replace(/[^,\d]/g, "").toString();
+        let split = value.split(",");
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            let separator = sisa ? "." : "";
+            rupiah += separator + ribuan.join(".");
+        }
+
+        rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+        input.value = rupiah;
     }
 
     function hapusBarisItem(button) {
@@ -302,20 +305,15 @@
         let items = [];
 
         itemRows.forEach(row => {
-            let selectElem = row.querySelector(".input-nama-barang");
-            let selectedOption = selectElem.options[selectElem.selectedIndex];
-            
-            let namaBarang = selectElem.value;
-            let sku = selectedOption.dataset.sku || "";
+            let namaBarang = row.querySelector(".input-nama-barang").value;
             let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
-            let harga = parseFloat(row.querySelector(".input-harga").value) || 0;
+            let hargaStr = row.querySelector(".input-harga").value;
 
             if (namaBarang && jumlah > 0) {
                 items.push({
-                    sku: sku,
                     nama_barang: namaBarang,
                     jumlah: jumlah,
-                    harga: harga
+                    harga: hargaStr // Dikirim dengan string berformat atau dibersihkan di backend
                 });
             }
         });
