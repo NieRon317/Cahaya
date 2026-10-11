@@ -36,6 +36,7 @@
             transition: background 0.2s;
         }
         .btn:hover { background-color: #2980b9; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-success { background-color: #2ecc71; font-size: 16px; padding: 12px 24px; }
         .btn-success:hover { background-color: #27ae60; }
         .btn-danger { background-color: #e74c3c; padding: 8px 12px; }
@@ -117,22 +118,38 @@
         }
         .alert-success { background-color: #d4edda; color: #155724; }
         .alert-error { background-color: #f8d7da; color: #721c24; }
+        .alert-info { background-color: #d1ecf1; color: #0c5460; }
+
+        #debug-box {
+            margin-top: 20px;
+            background: #1e1e1e;
+            color: #9cdcfe;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 220px;
+            overflow: auto;
+        }
+        .versi { font-size: 12px; color: #888; margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📦 Sistem Manajemen Stok Cahaya</h2>
-    
+    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v2 (fetch + debug)</span></h2>
+
     <div style="margin-bottom: 20px;">
         <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
     </div>
 
     <div class="form-card">
         <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
-        
+
         <form id="form-barang-masuk" onsubmit="submitData(event)">
-            
+
             <div class="invoice-header">
                 <div class="form-group">
                     <label>Nama Toko / Supplier</label>
@@ -163,7 +180,7 @@
             <div id="container-item-list"></div>
 
             <div style="margin-top: 20px;">
-                <button type="submit" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
+                <button type="submit" id="btn-simpan" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
             </div>
         </form>
     </div>
@@ -185,14 +202,21 @@
             </tr>
         </tbody>
     </table>
-</div>
 
-<!-- Iframe tersembunyi untuk bypass redirect POST Google Apps Script -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+    <h3>🛠️ Debug (balasan asli dari server)</h3>
+    <div id="debug-box">belum ada aktivitas...</div>
+</div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
     let globalListBarang = [];
+    let statusTimer = null;
+
+    function debug(text) {
+        let box = document.getElementById("debug-box");
+        let waktu = new Date().toLocaleTimeString();
+        box.textContent = "[" + waktu + "] " + text + "\n\n" + box.textContent;
+    }
 
     async function loadData() {
         let tbodyStok = document.getElementById("tabel-stok-body");
@@ -201,10 +225,10 @@
         try {
             let response = await fetch(SCRIPT_URL);
             let result = await response.json();
-            
+
             if (result.status === "success") {
                 globalListBarang = result.listBarang || [];
-                
+
                 let container = document.getElementById("container-item-list");
                 container.innerHTML = "";
                 tambahBarisItem();
@@ -223,12 +247,15 @@
                         tbodyStok.appendChild(tr);
                     });
                 }
+                debug("GET OK: " + globalListBarang.length + " barang, " + (result.dataStok || []).length + " baris stok");
             } else {
                 showStatus("Gagal memuat data dari server.", "error");
+                debug("GET gagal: " + JSON.stringify(result));
             }
         } catch (error) {
             console.error("Error:", error);
             tbodyStok.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
+            debug("GET error: " + error.message);
         }
     }
 
@@ -293,91 +320,91 @@
         }
     }
 
-async function submitData(event) {
-    event.preventDefault();
+    async function submitData(event) {
+        event.preventDefault();
 
-    let namaToko = document.getElementById("nama_toko").value;
-    let tglInvoice = document.getElementById("tanggal_invoice").value;
-    let noInvoice = document.getElementById("nomor_invoice").value;
+        let namaToko = document.getElementById("nama_toko").value;
+        let tglInvoice = document.getElementById("tanggal_invoice").value;
+        let noInvoice = document.getElementById("nomor_invoice").value;
 
-    let items = [];
-    document.querySelectorAll(".item-row").forEach(row => {
-        let namaBarang = row.querySelector(".input-nama-barang").value;
-        let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
-        let hargaStr = row.querySelector(".input-harga").value;
+        let items = [];
+        document.querySelectorAll(".item-row").forEach(row => {
+            let namaBarang = row.querySelector(".input-nama-barang").value;
+            let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
+            let hargaStr = row.querySelector(".input-harga").value;
 
-        if (namaBarang && jumlah > 0) {
-            items.push({ nama_barang: namaBarang, jumlah: jumlah, harga: hargaStr });
-        }
-    });
-
-    if (items.length === 0) {
-        alert("Harap isi setidaknya satu item barang dengan benar!");
-        return;
-    }
-
-    let payload = {
-        nama_toko: namaToko,
-        tanggal_invoice: tglInvoice,
-        nomor_invoice: noInvoice,
-        items: items
-    };
-
-    let btnSimpan = document.querySelector(".btn-success");
-    btnSimpan.disabled = true;
-    btnSimpan.textContent = "⏳ Menyimpan...";
-    showStatus("Menyimpan data invoice ke Google Sheets...", "success", 0);
-
-    try {
-        let response = await fetch(SCRIPT_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+            if (namaBarang && jumlah > 0) {
+                items.push({ nama_barang: namaBarang, jumlah: jumlah, harga: hargaStr });
+            }
         });
 
-        let result = await response.json();
-
-        if (result.status === "success") {
-            showStatus("✅ Data Barang Masuk berhasil disimpan ke Google Sheets!", "success");
-            document.getElementById("form-barang-masuk").reset();
-            document.getElementById("container-item-list").innerHTML = "";
-            tambahBarisItem();
-            loadData();
-        } else {
-            showStatus("❌ Gagal menyimpan: " + result.message, "error");
+        if (items.length === 0) {
+            alert("Harap isi setidaknya satu item barang dengan benar!");
+            return;
         }
-    } catch (error) {
-        console.error("Error simpan:", error);
-        showStatus("❌ Gagal terhubung ke server: " + error.message, "error");
-    } finally {
-        btnSimpan.disabled = false;
-        btnSimpan.textContent = "💾 Simpan Semua Barang Masuk";
+
+        let payload = {
+            nama_toko: namaToko,
+            tanggal_invoice: tglInvoice,
+            nomor_invoice: noInvoice,
+            items: items
+        };
+
+        let btn = document.getElementById("btn-simpan");
+        btn.disabled = true;
+        btn.textContent = "⏳ Menyimpan...";
+        showStatus("Menyimpan data invoice ke Google Sheets...", "info", 0);
+        debug("KIRIM POST: " + JSON.stringify(payload));
+
+        try {
+            let response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+
+            let rawText = await response.text();
+            debug("BALASAN SERVER (HTTP " + response.status + "):\n" + rawText.substring(0, 1500));
+
+            let result;
+            try {
+                result = JSON.parse(rawText);
+            } catch (e) {
+                showStatus("❌ Server tidak membalas JSON. Kemungkinan script belum di-deploy ulang / URL salah. Lihat panel debug.", "error", 0);
+                return;
+            }
+
+            if (result.status === "success") {
+                showStatus("✅ Berhasil disimpan! Server bilang: " + (result.message || "ok"), "success");
+                document.getElementById("form-barang-masuk").reset();
+                document.getElementById("container-item-list").innerHTML = "";
+                tambahBarisItem();
+                loadData();
+            } else {
+                showStatus("❌ Gagal menyimpan: " + result.message, "error", 0);
+            }
+        } catch (error) {
+            console.error("Error simpan:", error);
+            showStatus("❌ Gagal terhubung ke server: " + error.message, "error", 0);
+            debug("POST error: " + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "💾 Simpan Semua Barang Masuk";
+        }
     }
-}
 
-        function showStatus(message, type, duration = 4000) {
-    let msgDiv = document.getElementById("status-message");
-    msgDiv.style.display = "block";
-    msgDiv.className = type === "success" ? "alert-success" : "alert-error";
-    msgDiv.textContent = message;
-
-    clearTimeout(window._statusTimer);
-    if (duration > 0) {
-        window._statusTimer = setTimeout(() => {
-            msgDiv.style.display = "none";
-        }, duration);
-    }
-}
-
-    function showStatus(message, type) {
+    function showStatus(message, type, duration = 4000) {
         let msgDiv = document.getElementById("status-message");
         msgDiv.style.display = "block";
-        msgDiv.className = type === "success" ? "alert-success" : "alert-error";
+        msgDiv.className = type === "success" ? "alert-success" : (type === "info" ? "alert-info" : "alert-error");
         msgDiv.textContent = message;
-        
-        setTimeout(() => {
-            msgDiv.style.display = "none";
-        }, 4000);
+
+        clearTimeout(statusTimer);
+        if (duration > 0) {
+            statusTimer = setTimeout(() => {
+                msgDiv.style.display = "none";
+            }, duration);
+        }
     }
 
     window.onload = function() {
