@@ -139,7 +139,7 @@
 <body>
 
 <div class="container">
-    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v2 (fetch + debug)</span></h2>
+    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v3 (stok dihitung di script)</span></h2>
 
     <div style="margin-bottom: 20px;">
         <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
@@ -193,12 +193,16 @@
             <tr>
                 <th>Nama Barang</th>
                 <th>Kategori</th>
+                <th>Masuk</th>
+                <th>Keluar</th>
                 <th>Stok Tersedia</th>
+                <th>Status</th>
+                <th>Nilai Aset</th>
             </tr>
         </thead>
         <tbody id="tabel-stok-body">
             <tr>
-                <td colspan="3" style="text-align: center;">Memuat data dari Google Sheets...</td>
+                <td colspan="7" style="text-align: center;">Memuat data dari Google Sheets...</td>
             </tr>
         </tbody>
     </table>
@@ -220,7 +224,7 @@
 
     async function loadData() {
         let tbodyStok = document.getElementById("tabel-stok-body");
-        tbodyStok.innerHTML = '<tr><td colspan="3" style="text-align: center;">Memuat data...</td></tr>';
+        tbodyStok.innerHTML = '<tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>';
 
         try {
             let response = await fetch(SCRIPT_URL);
@@ -235,14 +239,19 @@
 
                 tbodyStok.innerHTML = "";
                 if (!result.dataStok || result.dataStok.length === 0) {
-                    tbodyStok.innerHTML = '<tr><td colspan="3" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
+                    tbodyStok.innerHTML = '<tr><td colspan="7" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
                 } else {
                     result.dataStok.forEach(row => {
                         let tr = document.createElement("tr");
+                        let ikon = row.status === "Habis" ? "🔴" : (row.status === "Menipis" ? "🟡" : "🟢");
                         tr.innerHTML = `
                             <td>${row.nama_barang || '-'}</td>
                             <td>${row.kategori || '-'}</td>
+                            <td>${row.total_masuk || 0}</td>
+                            <td>${row.total_keluar || 0}</td>
                             <td><strong>${row.stok || 0}</strong></td>
+                            <td>${ikon} ${row.status || '-'}</td>
+                            <td>Rp ${Number(row.nilai_aset || 0).toLocaleString('id-ID')}</td>
                         `;
                         tbodyStok.appendChild(tr);
                     });
@@ -254,7 +263,7 @@
             }
         } catch (error) {
             console.error("Error:", error);
-            tbodyStok.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
+            tbodyStok.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
             debug("GET error: " + error.message);
         }
     }
