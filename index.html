@@ -13,27 +13,18 @@
             padding: 20px;
         }
         .container {
-            max-width: 1050px;
+            max-width: 1100px;
             margin: 0 auto;
             background: #fff;
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-        h2, h3 {
-            color: #2c3e50;
-            border-bottom: 2px solid #eaeaea;
-            padding-bottom: 8px;
-        }
+        h2, h3 { color: #2c3e50; border-bottom: 2px solid #eaeaea; padding-bottom: 8px; }
         .btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            background-color: #3498db; color: white; border: none;
+            padding: 10px 18px; border-radius: 4px; cursor: pointer;
+            font-weight: bold; transition: background 0.2s;
         }
         .btn:hover { background-color: #2980b9; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -41,187 +32,331 @@
         .btn-success:hover { background-color: #27ae60; }
         .btn-danger { background-color: #e74c3c; padding: 8px 12px; }
         .btn-danger:hover { background-color: #c0392b; }
-        .btn-warning { background-color: #f39c12; color: white; }
+        .btn-warning { background-color: #f39c12; }
         .btn-warning:hover { background-color: #d68910; }
+        .btn-orange { background-color: #e67e22; font-size: 16px; padding: 12px 24px; }
+        .btn-orange:hover { background-color: #d35400; }
+        .btn-gray { background-color: #7f8c8d; }
+        .btn-gray:hover { background-color: #636e72; }
+        .btn-small { padding: 6px 12px; font-size: 13px; }
+
+        .tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
+        .tab-btn {
+            background: #ecf0f1; color: #2c3e50; border: none; padding: 10px 16px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
+        }
+        .tab-btn:hover { background: #dfe6e9; }
+        .tab-btn.active { background: #2c3e50; color: #fff; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
         .form-card {
-            background: #ffffff;
-            border: 1px solid #d1d8e0;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-            margin-bottom: 20px;
+            background: #fff; border: 1px solid #d1d8e0; border-radius: 8px;
+            padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px;
         }
         .invoice-header {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #e1e4e8;
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;
+            background: #f8f9fa; padding: 15px; border-radius: 6px;
+            border: 1px solid #e1e4e8; margin-bottom: 20px;
         }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 5px;
-        }
+        .form-group label { display: block; font-weight: bold; font-size: 13px; color: #555; margin-bottom: 5px; }
         .grid-container {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 80px;
-            gap: 10px;
-            align-items: center;
-            background: #fdfdfd;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 10px;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 80px; gap: 10px;
+            align-items: center; background: #fdfdfd; padding: 10px;
+            border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 10px;
         }
-        .grid-header {
-            font-weight: bold;
-            color: #555;
-            font-size: 13px;
-        }
+        .grid-header { font-weight: bold; color: #555; font-size: 13px; }
         input, select {
-            width: 100%;
-            padding: 9px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
+            width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 4px;
+            box-sizing: border-box; font-size: 14px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-            font-size: 14px;
-        }
-        th {
-            background-color: #2c3e50;
-            color: white;
-        }
+        input:disabled { background: #eee; color: #999; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; font-size: 14px; }
+        th { background-color: #2c3e50; color: white; }
         tr:nth-child(even) { background-color: #f9f9f9; }
-        #status-message {
-            margin-top: 15px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 4px;
-            display: none;
-        }
+        .num { text-align: right; }
+
+        #status-message { margin: 0 0 15px; font-weight: bold; padding: 10px; border-radius: 4px; display: none; }
         .alert-success { background-color: #d4edda; color: #155724; }
         .alert-error { background-color: #f8d7da; color: #721c24; }
         .alert-info { background-color: #d1ecf1; color: #0c5460; }
 
+        .filter-bar { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: end; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e1e4e8; }
+        #hasil-keluar { display: none; margin-top: 15px; padding: 12px; background: #d4edda; border-radius: 6px; }
+
         #debug-box {
-            margin-top: 20px;
-            background: #1e1e1e;
-            color: #9cdcfe;
-            font-family: Consolas, monospace;
-            font-size: 12px;
-            padding: 12px;
-            border-radius: 6px;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 220px;
-            overflow: auto;
+            margin-top: 20px; background: #1e1e1e; color: #9cdcfe;
+            font-family: Consolas, monospace; font-size: 12px; padding: 12px;
+            border-radius: 6px; white-space: pre-wrap; word-break: break-all;
+            max-height: 220px; overflow: auto;
         }
-        .versi { font-size: 12px; color: #888; margin-left: 10px; }
+        .versi { font-size: 12px; color: #888; margin-left: 10px; font-weight: normal; }
+
+        /* ===== Modal invoice ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            z-index: 1000; overflow: auto; padding: 30px 15px;
+        }
+        .modal-box {
+            background: #fff; max-width: 780px; margin: 0 auto; border-radius: 8px;
+            padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 15px; }
+        .inv-head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #2c3e50; padding-bottom: 12px; margin-bottom: 15px; }
+        .inv-head h1 { margin: 0; font-size: 26px; color: #2c3e50; }
+        .inv-head .sub { color: #666; font-size: 13px; }
+        .inv-no { text-align: right; font-size: 14px; line-height: 1.6; }
+        .inv-meta { width: 100%; margin: 0 0 10px; }
+        .inv-meta td { border: none; padding: 3px 0; font-size: 14px; }
+        .inv-meta td:first-child { width: 120px; color: #555; }
+        .inv-total td { font-weight: bold; font-size: 15px; background: #f1f3f5; }
+        .inv-sign { display: flex; justify-content: space-around; margin-top: 50px; text-align: center; font-size: 14px; }
+        .inv-sign div { width: 180px; }
+        .inv-sign .garis { border-top: 1px solid #333; margin-top: 60px; padding-top: 4px; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container, .no-print { display: none !important; }
+            .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
+            .modal-box { box-shadow: none; max-width: 100%; padding: 0; }
+            th { background: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v3 (stok dihitung di script)</span></h2>
+    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v4 (masuk + keluar + riwayat)</span></h2>
 
-    <div style="margin-bottom: 20px;">
-        <button class="btn" onclick="loadData()">🔄 Refresh Data</button>
-    </div>
-
-    <div class="form-card">
-        <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
-
-        <form id="form-barang-masuk" onsubmit="submitData(event)">
-
-            <div class="invoice-header">
-                <div class="form-group">
-                    <label>Nama Toko / Supplier</label>
-                    <input type="text" id="nama_toko" placeholder="Contoh: Toko Berkah" required>
-                </div>
-                <div class="form-group">
-                    <label>Tanggal Invoice</label>
-                    <input type="date" id="tanggal_invoice" required>
-                </div>
-                <div class="form-group">
-                    <label>Nomor Invoice</label>
-                    <input type="text" id="nomor_invoice" placeholder="Contoh: INV/2026/001" required>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label style="font-weight: bold; color: #333;">Daftar Item Barang Masuk:</label>
-                <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
-            </div>
-
-            <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
-                <div class="grid-header">Nama Barang (Dropdown)</div>
-                <div class="grid-header">Jumlah Masuk</div>
-                <div class="grid-header">Harga Beli Satuan (Rp)</div>
-                <div class="grid-header">Aksi</div>
-            </div>
-
-            <div id="container-item-list"></div>
-
-            <div style="margin-top: 20px;">
-                <button type="submit" id="btn-simpan" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
-            </div>
-        </form>
+    <div class="tabs">
+        <button class="tab-btn active" id="btn-tab-masuk" onclick="bukaTab('tab-masuk')">📥 Barang Masuk</button>
+        <button class="tab-btn" id="btn-tab-keluar" onclick="bukaTab('tab-keluar')">📤 Barang Keluar</button>
+        <button class="tab-btn" id="btn-tab-riwayat" onclick="bukaTab('tab-riwayat')">🧾 Riwayat Invoice Keluar</button>
+        <button class="tab-btn" id="btn-tab-stok" onclick="bukaTab('tab-stok')">📊 Stok Gudang</button>
+        <button class="btn btn-small" style="margin-left:auto;" onclick="refreshSemua()">🔄 Refresh Data</button>
     </div>
 
     <div id="status-message"></div>
 
-    <h3>📊 Daftar Master Stok Gudang</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Nama Barang</th>
-                <th>Kategori</th>
-                <th>Masuk</th>
-                <th>Keluar</th>
-                <th>Stok Tersedia</th>
-                <th>Status</th>
-                <th>Nilai Aset</th>
-            </tr>
-        </thead>
-        <tbody id="tabel-stok-body">
-            <tr>
-                <td colspan="7" style="text-align: center;">Memuat data dari Google Sheets...</td>
-            </tr>
-        </tbody>
-    </table>
+    <!-- ================= TAB BARANG MASUK ================= -->
+    <div id="tab-masuk" class="tab-panel active">
+        <div class="form-card">
+            <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
+            <form id="form-barang-masuk" onsubmit="submitData(event)">
+                <div class="invoice-header">
+                    <div class="form-group">
+                        <label>Nama Toko / Supplier</label>
+                        <input type="text" id="nama_toko" placeholder="Contoh: Toko Berkah" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Invoice</label>
+                        <input type="date" id="tanggal_invoice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Invoice</label>
+                        <input type="text" id="nomor_invoice" placeholder="Contoh: INV/2026/001" required>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="font-weight: bold;">Daftar Item Barang Masuk:</label>
+                    <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
+                </div>
+
+                <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
+                    <div class="grid-header">Nama Barang (Dropdown)</div>
+                    <div class="grid-header">Jumlah Masuk</div>
+                    <div class="grid-header">Harga Beli Satuan (Rp)</div>
+                    <div class="grid-header">Aksi</div>
+                </div>
+
+                <div id="container-item-list"></div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" id="btn-simpan" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= TAB BARANG KELUAR ================= -->
+    <div id="tab-keluar" class="tab-panel">
+        <div class="form-card">
+            <h3>📤 Form Input Barang Keluar</h3>
+            <form id="form-barang-keluar" onsubmit="submitKeluar(event)">
+                <div class="invoice-header">
+                    <div class="form-group">
+                        <label>Nama Pelanggan / Tujuan</label>
+                        <input type="text" id="nama_pelanggan" placeholder="Contoh: Budi / Umum">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipe Keluar</label>
+                        <select id="tipe_keluar" onchange="terapkanTipe()">
+                            <option value="Penjualan">Penjualan</option>
+                            <option value="Pemakaian Internal">Pemakaian Internal</option>
+                            <option value="Rusak / Hilang">Rusak / Hilang</option>
+                            <option value="Retur ke Supplier">Retur ke Supplier</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan (opsional)</label>
+                        <input type="text" id="catatan_keluar" placeholder="Contoh: bayar cash">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="font-weight: bold;">Daftar Item Barang Keluar:</label>
+                    <button type="button" class="btn btn-warning" onclick="tambahBarisKeluar()">➕ Tambah Baris</button>
+                </div>
+
+                <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
+                    <div class="grid-header">Nama Barang (stok tersedia)</div>
+                    <div class="grid-header">Jumlah Keluar</div>
+                    <div class="grid-header">Harga Jual Satuan (Rp)</div>
+                    <div class="grid-header">Aksi</div>
+                </div>
+
+                <div id="container-keluar-list"></div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" id="btn-simpan-keluar" class="btn btn-orange">📤 Simpan Barang Keluar</button>
+                </div>
+            </form>
+
+            <div id="hasil-keluar">
+                <span id="hasil-keluar-teks"></span>
+                <button type="button" class="btn btn-small" onclick="bukaInvoice(lastInvoice)">🖨️ Lihat / Cetak Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TAB RIWAYAT ================= -->
+    <div id="tab-riwayat" class="tab-panel">
+        <h3>🧾 Riwayat Invoice Barang Keluar</h3>
+        <div class="filter-bar">
+            <div class="form-group">
+                <label>Cari (No. Invoice / Pelanggan / Barang)</label>
+                <input type="text" id="cari-riwayat" placeholder="Ketik untuk mencari..." oninput="renderRiwayat()">
+            </div>
+            <div class="form-group">
+                <label>Dari Tanggal</label>
+                <input type="date" id="tgl-dari" onchange="renderRiwayat()">
+            </div>
+            <div class="form-group">
+                <label>Sampai Tanggal</label>
+                <input type="date" id="tgl-sampai" onchange="renderRiwayat()">
+            </div>
+            <button class="btn btn-gray" onclick="resetFilterRiwayat()">Reset</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>No. Invoice</th>
+                    <th>Tanggal</th>
+                    <th>Pelanggan</th>
+                    <th>Tipe</th>
+                    <th class="num">Item</th>
+                    <th class="num">Total</th>
+                    <th class="num">Est. Laba</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-riwayat-body">
+                <tr><td colspan="8" style="text-align:center;">Buka tab ini untuk memuat data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= TAB STOK ================= -->
+    <div id="tab-stok" class="tab-panel">
+        <h3>📊 Daftar Master Stok Gudang</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>Kategori</th>
+                    <th class="num">Masuk</th>
+                    <th class="num">Keluar</th>
+                    <th class="num">Stok Tersedia</th>
+                    <th>Status</th>
+                    <th class="num">Nilai Aset</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-stok-body">
+                <tr><td colspan="7" style="text-align: center;">Memuat data dari Google Sheets...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <h3>🛠️ Debug (balasan asli dari server)</h3>
     <div id="debug-box">belum ada aktivitas...</div>
 </div>
 
+<!-- ================= MODAL INVOICE ================= -->
+<div class="modal-overlay" id="modal-invoice">
+    <div class="modal-box">
+        <div class="modal-actions no-print">
+            <button class="btn" onclick="window.print()">🖨️ Cetak</button>
+            <button class="btn btn-gray" onclick="tutupInvoice()">✖ Tutup</button>
+        </div>
+        <div id="invoice-isi"></div>
+    </div>
+</div>
+
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
+    const NAMA_TOKO = "CAHAYA";   // ganti sesuai nama toko, tampil di invoice cetak
+
     let globalListBarang = [];
+    let globalRiwayat = [];
+    let lastInvoice = null;
     let statusTimer = null;
 
+    // ---------- util ----------
+    function esc(s) {
+        return String(s === undefined || s === null ? "" : s)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+    function rp(n) { return "Rp " + Number(n || 0).toLocaleString("id-ID"); }
     function debug(text) {
         let box = document.getElementById("debug-box");
-        let waktu = new Date().toLocaleTimeString();
-        box.textContent = "[" + waktu + "] " + text + "\n\n" + box.textContent;
+        box.textContent = "[" + new Date().toLocaleTimeString() + "] " + text + "\n\n" + box.textContent;
+    }
+    function showStatus(message, type, duration = 4000) {
+        let msgDiv = document.getElementById("status-message");
+        msgDiv.style.display = "block";
+        msgDiv.className = type === "success" ? "alert-success" : (type === "info" ? "alert-info" : "alert-error");
+        msgDiv.textContent = message;
+        clearTimeout(statusTimer);
+        if (duration > 0) statusTimer = setTimeout(() => { msgDiv.style.display = "none"; }, duration);
+    }
+    function formatRupiah(input) {
+        let value = input.value.replace(/[^,\d]/g, "").toString();
+        let split = value.split(",");
+        let sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        if (ribuan) rupiah += (sisa ? "." : "") + ribuan.join(".");
+        input.value = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+    }
+    function angka(str) { return parseFloat(String(str || "0").replace(/\./g, "").replace(/,/g, "")) || 0; }
+
+    // ---------- tab ----------
+    function bukaTab(id) {
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document.getElementById("btn-" + id).classList.add("active");
+        if (id === "tab-riwayat") loadRiwayat();
+    }
+    function refreshSemua() {
+        loadData();
+        if (document.getElementById("tab-riwayat").classList.contains("active")) loadRiwayat();
     }
 
+    // ---------- load data stok ----------
     async function loadData() {
         let tbodyStok = document.getElementById("tabel-stok-body");
         tbodyStok.innerHTML = '<tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>';
@@ -232,33 +367,33 @@
 
             if (result.status === "success") {
                 globalListBarang = result.listBarang || [];
+                segarkanDropdown();
 
-                let container = document.getElementById("container-item-list");
-                container.innerHTML = "";
-                tambahBarisItem();
+                if (document.getElementById("container-item-list").children.length === 0) tambahBarisItem();
+                if (document.getElementById("container-keluar-list").children.length === 0) tambahBarisKeluar();
 
                 tbodyStok.innerHTML = "";
                 if (!result.dataStok || result.dataStok.length === 0) {
                     tbodyStok.innerHTML = '<tr><td colspan="7" style="text-align:center;">Belum ada data stok tersedia.</td></tr>';
                 } else {
                     result.dataStok.forEach(row => {
-                        let tr = document.createElement("tr");
                         let ikon = row.status === "Habis" ? "🔴" : (row.status === "Menipis" ? "🟡" : "🟢");
+                        let tr = document.createElement("tr");
                         tr.innerHTML = `
-                            <td>${row.nama_barang || '-'}</td>
-                            <td>${row.kategori || '-'}</td>
-                            <td>${row.total_masuk || 0}</td>
-                            <td>${row.total_keluar || 0}</td>
-                            <td><strong>${row.stok || 0}</strong></td>
-                            <td>${ikon} ${row.status || '-'}</td>
-                            <td>Rp ${Number(row.nilai_aset || 0).toLocaleString('id-ID')}</td>
+                            <td>${esc(row.nama_barang) || '-'}</td>
+                            <td>${esc(row.kategori) || '-'}</td>
+                            <td class="num">${row.total_masuk || 0}</td>
+                            <td class="num">${row.total_keluar || 0}</td>
+                            <td class="num"><strong>${row.stok || 0}</strong></td>
+                            <td>${ikon} ${esc(row.status) || '-'}</td>
+                            <td class="num">${rp(row.nilai_aset)}</td>
                         `;
                         tbodyStok.appendChild(tr);
                     });
                 }
                 debug("GET OK: " + globalListBarang.length + " barang, " + (result.dataStok || []).length + " baris stok");
             } else {
-                showStatus("Gagal memuat data dari server.", "error");
+                showStatus("Gagal memuat data dari server: " + (result.message || ""), "error");
                 debug("GET gagal: " + JSON.stringify(result));
             }
         } catch (error) {
@@ -268,123 +403,101 @@
         }
     }
 
+    // ---------- dropdown ----------
+    function opsiMasuk() {
+        let h = '<option value="">-- Pilih Nama Barang --</option>';
+        if (globalListBarang.length > 0) {
+            globalListBarang.forEach(b => { h += `<option value="${esc(b.nama_barang)}">${esc(b.nama_barang)}</option>`; });
+        } else {
+            h += '<option value="" disabled>Data barang kosong</option>';
+        }
+        return h;
+    }
+    function opsiKeluar() {
+        let h = '<option value="">-- Pilih Nama Barang --</option>';
+        if (globalListBarang.length > 0) {
+            globalListBarang.forEach(b => {
+                let stok = Number(b.stok) || 0;
+                h += `<option value="${esc(b.nama_barang)}" ${stok <= 0 ? "disabled" : ""}>${esc(b.nama_barang)} (stok: ${stok})</option>`;
+            });
+        } else {
+            h += '<option value="" disabled>Data barang kosong</option>';
+        }
+        return h;
+    }
+    function segarkanDropdown() {
+        document.querySelectorAll(".input-nama-barang").forEach(sel => {
+            let v = sel.value; sel.innerHTML = opsiMasuk(); sel.value = v;
+        });
+        document.querySelectorAll(".keluar-barang").forEach(sel => {
+            let v = sel.value; sel.innerHTML = opsiKeluar(); sel.value = v;
+        });
+    }
+
+    // ---------- barang masuk ----------
     function tambahBarisItem() {
         let container = document.getElementById("container-item-list");
-
         let rowDiv = document.createElement("div");
         rowDiv.className = "grid-container item-row";
         rowDiv.style.marginBottom = "8px";
-
-        let optionsHtml = '<option value="">-- Pilih Nama Barang --</option>';
-        if (globalListBarang.length > 0) {
-            globalListBarang.forEach(item => {
-                optionsHtml += `<option value="${item.nama_barang}">${item.nama_barang}</option>`;
-            });
-        } else {
-            optionsHtml += '<option value="" disabled>Data barang kosong</option>';
-        }
-
         rowDiv.innerHTML = `
-            <div>
-                <select class="input-nama-barang" required>
-                    ${optionsHtml}
-                </select>
-            </div>
-            <div>
-                <input type="number" class="input-jumlah" min="1" value="1" required>
-            </div>
-            <div>
-                <input type="text" class="input-harga" value="0" onkeyup="formatRupiah(this)" required>
-            </div>
-            <div>
-                <button type="button" class="btn btn-danger" onclick="hapusBarisItem(this)">Hapus</button>
-            </div>
+            <div><select class="input-nama-barang" required>${opsiMasuk()}</select></div>
+            <div><input type="number" class="input-jumlah" min="1" value="1" required></div>
+            <div><input type="text" class="input-harga" value="0" onkeyup="formatRupiah(this)" required></div>
+            <div><button type="button" class="btn btn-danger" onclick="hapusBarisItem(this)">Hapus</button></div>
         `;
-
         container.appendChild(rowDiv);
     }
-
-    function formatRupiah(input) {
-        let value = input.value.replace(/[^,\d]/g, "").toString();
-        let split = value.split(",");
-        let sisa = split[0].length % 3;
-        let rupiah = split[0].substr(0, sisa);
-        let ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-        if (ribuan) {
-            let separator = sisa ? "." : "";
-            rupiah += separator + ribuan.join(".");
-        }
-
-        rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-        input.value = rupiah;
-    }
-
     function hapusBarisItem(button) {
         let container = document.getElementById("container-item-list");
-        if (container.children.length > 1) {
-            button.closest(".item-row").remove();
-        } else {
-            alert("Minimal harus ada 1 item barang dalam transaksi!");
+        if (container.children.length > 1) button.closest(".item-row").remove();
+        else alert("Minimal harus ada 1 item barang dalam transaksi!");
+    }
+
+    // ---------- kirim POST (dipakai masuk & keluar) ----------
+    async function kirimPost(payload) {
+        debug("KIRIM POST: " + JSON.stringify(payload));
+        let response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        });
+        let raw = await response.text();
+        debug("BALASAN SERVER (HTTP " + response.status + "):\n" + raw.substring(0, 1500));
+        try { return JSON.parse(raw); }
+        catch (e) {
+            return { status: "error", message: "Server tidak membalas JSON. Kemungkinan script belum di-deploy ulang / URL salah. Lihat panel debug." };
         }
     }
 
     async function submitData(event) {
         event.preventDefault();
 
-        let namaToko = document.getElementById("nama_toko").value;
-        let tglInvoice = document.getElementById("tanggal_invoice").value;
-        let noInvoice = document.getElementById("nomor_invoice").value;
-
         let items = [];
         document.querySelectorAll(".item-row").forEach(row => {
             let namaBarang = row.querySelector(".input-nama-barang").value;
             let jumlah = parseInt(row.querySelector(".input-jumlah").value) || 0;
             let hargaStr = row.querySelector(".input-harga").value;
-
-            if (namaBarang && jumlah > 0) {
-                items.push({ nama_barang: namaBarang, jumlah: jumlah, harga: hargaStr });
-            }
+            if (namaBarang && jumlah > 0) items.push({ nama_barang: namaBarang, jumlah: jumlah, harga: hargaStr });
         });
-
-        if (items.length === 0) {
-            alert("Harap isi setidaknya satu item barang dengan benar!");
-            return;
-        }
+        if (items.length === 0) { alert("Harap isi setidaknya satu item barang dengan benar!"); return; }
 
         let payload = {
-            nama_toko: namaToko,
-            tanggal_invoice: tglInvoice,
-            nomor_invoice: noInvoice,
+            aksi: "barang_masuk",
+            nama_toko: document.getElementById("nama_toko").value,
+            tanggal_invoice: document.getElementById("tanggal_invoice").value,
+            nomor_invoice: document.getElementById("nomor_invoice").value,
             items: items
         };
 
         let btn = document.getElementById("btn-simpan");
-        btn.disabled = true;
-        btn.textContent = "⏳ Menyimpan...";
+        btn.disabled = true; btn.textContent = "⏳ Menyimpan...";
         showStatus("Menyimpan data invoice ke Google Sheets...", "info", 0);
-        debug("KIRIM POST: " + JSON.stringify(payload));
 
         try {
-            let response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload)
-            });
-
-            let rawText = await response.text();
-            debug("BALASAN SERVER (HTTP " + response.status + "):\n" + rawText.substring(0, 1500));
-
-            let result;
-            try {
-                result = JSON.parse(rawText);
-            } catch (e) {
-                showStatus("❌ Server tidak membalas JSON. Kemungkinan script belum di-deploy ulang / URL salah. Lihat panel debug.", "error", 0);
-                return;
-            }
-
+            let result = await kirimPost(payload);
             if (result.status === "success") {
-                showStatus("✅ Berhasil disimpan! Server bilang: " + (result.message || "ok"), "success");
+                showStatus("✅ " + (result.message || "Berhasil disimpan"), "success");
                 document.getElementById("form-barang-masuk").reset();
                 document.getElementById("container-item-list").innerHTML = "";
                 tambahBarisItem();
@@ -393,30 +506,227 @@
                 showStatus("❌ Gagal menyimpan: " + result.message, "error", 0);
             }
         } catch (error) {
-            console.error("Error simpan:", error);
             showStatus("❌ Gagal terhubung ke server: " + error.message, "error", 0);
             debug("POST error: " + error.message);
         } finally {
-            btn.disabled = false;
-            btn.textContent = "💾 Simpan Semua Barang Masuk";
+            btn.disabled = false; btn.textContent = "💾 Simpan Semua Barang Masuk";
         }
     }
 
-    function showStatus(message, type, duration = 4000) {
-        let msgDiv = document.getElementById("status-message");
-        msgDiv.style.display = "block";
-        msgDiv.className = type === "success" ? "alert-success" : (type === "info" ? "alert-info" : "alert-error");
-        msgDiv.textContent = message;
+    // ---------- barang keluar ----------
+    function tambahBarisKeluar() {
+        let container = document.getElementById("container-keluar-list");
+        let isJual = document.getElementById("tipe_keluar").value === "Penjualan";
+        let rowDiv = document.createElement("div");
+        rowDiv.className = "grid-container keluar-row";
+        rowDiv.style.marginBottom = "8px";
+        rowDiv.innerHTML = `
+            <div><select class="keluar-barang" required>${opsiKeluar()}</select></div>
+            <div><input type="number" class="keluar-jumlah" min="1" value="1" required></div>
+            <div><input type="text" class="keluar-harga" value="0" onkeyup="formatRupiah(this)" ${isJual ? "" : "disabled"}></div>
+            <div><button type="button" class="btn btn-danger" onclick="hapusBarisKeluar(this)">Hapus</button></div>
+        `;
+        container.appendChild(rowDiv);
+    }
+    function hapusBarisKeluar(button) {
+        let container = document.getElementById("container-keluar-list");
+        if (container.children.length > 1) button.closest(".keluar-row").remove();
+        else alert("Minimal harus ada 1 item barang dalam transaksi!");
+    }
+    function terapkanTipe() {
+        let isJual = document.getElementById("tipe_keluar").value === "Penjualan";
+        document.querySelectorAll(".keluar-harga").forEach(inp => {
+            inp.disabled = !isJual;
+            if (!isJual) inp.value = "0";
+        });
+    }
 
-        clearTimeout(statusTimer);
-        if (duration > 0) {
-            statusTimer = setTimeout(() => {
-                msgDiv.style.display = "none";
-            }, duration);
+    async function submitKeluar(event) {
+        event.preventDefault();
+
+        let tipe = document.getElementById("tipe_keluar").value;
+        let items = [];
+        let perBarang = {};
+        let adaHargaNol = false;
+
+        document.querySelectorAll(".keluar-row").forEach(row => {
+            let nama = row.querySelector(".keluar-barang").value;
+            let jumlah = parseInt(row.querySelector(".keluar-jumlah").value) || 0;
+            let harga = row.querySelector(".keluar-harga").value;
+            if (nama && jumlah > 0) {
+                items.push({ nama_barang: nama, jumlah: jumlah, harga: harga });
+                perBarang[nama] = (perBarang[nama] || 0) + jumlah;
+                if (tipe === "Penjualan" && angka(harga) === 0) adaHargaNol = true;
+            }
+        });
+        if (items.length === 0) { alert("Harap isi setidaknya satu item barang dengan benar!"); return; }
+
+        // cek stok di sisi browser (server tetap yang menentukan)
+        for (let nama in perBarang) {
+            let b = globalListBarang.find(x => x.nama_barang === nama);
+            let stok = b ? Number(b.stok) || 0 : 0;
+            if (perBarang[nama] > stok) {
+                alert("Stok " + nama + " tidak cukup! Tersedia: " + stok + ", diminta: " + perBarang[nama]);
+                return;
+            }
+        }
+        if (adaHargaNol && !confirm("Ada item dengan harga jual Rp 0. Tetap lanjut simpan?")) return;
+
+        let payload = {
+            aksi: "barang_keluar",
+            nama_pelanggan: document.getElementById("nama_pelanggan").value,
+            tipe_keluar: tipe,
+            catatan: document.getElementById("catatan_keluar").value,
+            items: items
+        };
+
+        let btn = document.getElementById("btn-simpan-keluar");
+        btn.disabled = true; btn.textContent = "⏳ Menyimpan...";
+        document.getElementById("hasil-keluar").style.display = "none";
+        showStatus("Menyimpan barang keluar ke Google Sheets...", "info", 0);
+
+        try {
+            let result = await kirimPost(payload);
+            if (result.status === "success") {
+                lastInvoice = result.invoice;
+                showStatus("✅ " + result.message, "success", 8000);
+                document.getElementById("hasil-keluar-teks").textContent = "✅ Tersimpan sebagai " + result.invoice.no_invoice + "  ";
+                document.getElementById("hasil-keluar").style.display = "block";
+                document.getElementById("form-barang-keluar").reset();
+                document.getElementById("container-keluar-list").innerHTML = "";
+                tambahBarisKeluar();
+                loadData();
+            } else {
+                showStatus("❌ " + result.message, "error", 0);
+            }
+        } catch (error) {
+            showStatus("❌ Gagal terhubung ke server: " + error.message, "error", 0);
+            debug("POST error: " + error.message);
+        } finally {
+            btn.disabled = false; btn.textContent = "📤 Simpan Barang Keluar";
         }
     }
 
-    window.onload = function() {
+    // ---------- riwayat ----------
+    async function loadRiwayat() {
+        let tbody = document.getElementById("tabel-riwayat-body");
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Memuat riwayat...</td></tr>';
+        try {
+            let response = await fetch(SCRIPT_URL + "?aksi=riwayat_keluar");
+            let result = await response.json();
+            if (result.status === "success") {
+                globalRiwayat = result.riwayat || [];
+                debug("RIWAYAT OK: " + globalRiwayat.length + " invoice");
+                renderRiwayat();
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;">Gagal: ' + esc(result.message) + '</td></tr>';
+                debug("RIWAYAT gagal: " + JSON.stringify(result));
+            }
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
+            debug("RIWAYAT error: " + error.message);
+        }
+    }
+
+    function renderRiwayat() {
+        let tbody = document.getElementById("tabel-riwayat-body");
+        let cari = document.getElementById("cari-riwayat").value.trim().toLowerCase();
+        let dari = document.getElementById("tgl-dari").value;
+        let sampai = document.getElementById("tgl-sampai").value;
+
+        let hasil = globalRiwayat.filter(inv => {
+            let tgl = (inv.tanggal || "").substring(0, 10);
+            if (dari && tgl < dari) return false;
+            if (sampai && tgl > sampai) return false;
+            if (cari) {
+                let teks = (inv.no_invoice + " " + inv.pelanggan + " " + inv.tipe + " " +
+                    inv.items.map(i => i.nama).join(" ")).toLowerCase();
+                if (teks.indexOf(cari) === -1) return false;
+            }
+            return true;
+        });
+
+        if (hasil.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Tidak ada invoice yang cocok.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = "";
+        hasil.forEach(inv => {
+            let idx = globalRiwayat.indexOf(inv);
+            let tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${esc(inv.no_invoice)}</strong></td>
+                <td>${esc(inv.tanggal)}</td>
+                <td>${esc(inv.pelanggan)}</td>
+                <td>${esc(inv.tipe)}</td>
+                <td class="num">${inv.items.length}</td>
+                <td class="num">${rp(inv.total)}</td>
+                <td class="num">${rp(inv.laba)}</td>
+                <td><button class="btn btn-small" onclick="bukaInvoice(globalRiwayat[${idx}])">🖨️ Detail / Cetak</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function resetFilterRiwayat() {
+        document.getElementById("cari-riwayat").value = "";
+        document.getElementById("tgl-dari").value = "";
+        document.getElementById("tgl-sampai").value = "";
+        renderRiwayat();
+    }
+
+    // ---------- invoice (preview + cetak) ----------
+    function bukaInvoice(inv) {
+        if (!inv) return;
+        let isJual = inv.tipe === "Penjualan";
+        let baris = inv.items.map((it, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${esc(it.sku)}</td>
+                <td>${esc(it.nama)}</td>
+                <td class="num">${it.jumlah}</td>
+                <td class="num">${isJual ? rp(it.harga) : "-"}</td>
+                <td class="num">${isJual ? rp(it.total) : "-"}</td>
+            </tr>`).join("");
+
+        document.getElementById("invoice-isi").innerHTML = `
+            <div class="inv-head">
+                <div>
+                    <h1>${esc(NAMA_TOKO)}</h1>
+                    <div class="sub">Bukti Barang Keluar</div>
+                </div>
+                <div class="inv-no">
+                    <strong>No. ${esc(inv.no_invoice)}</strong><br>
+                    Tanggal: ${esc(inv.tanggal)}
+                </div>
+            </div>
+            <table class="inv-meta">
+                <tr><td>Pelanggan / Tujuan</td><td>: ${esc(inv.pelanggan)}</td></tr>
+                <tr><td>Tipe Keluar</td><td>: ${esc(inv.tipe)}</td></tr>
+                ${inv.catatan ? `<tr><td>Catatan</td><td>: ${esc(inv.catatan)}</td></tr>` : ""}
+            </table>
+            <table>
+                <thead>
+                    <tr><th>No</th><th>SKU</th><th>Nama Barang</th><th class="num">Jumlah</th><th class="num">Harga</th><th class="num">Subtotal</th></tr>
+                </thead>
+                <tbody>
+                    ${baris}
+                    ${isJual ? `<tr class="inv-total"><td colspan="5" class="num">TOTAL</td><td class="num">${rp(inv.total)}</td></tr>` : ""}
+                </tbody>
+            </table>
+            <div class="inv-sign">
+                <div>Dibuat oleh<div class="garis">(............)</div></div>
+                <div>Penerima<div class="garis">(............)</div></div>
+            </div>
+        `;
+        document.getElementById("modal-invoice").style.display = "block";
+    }
+    function tutupInvoice() {
+        document.getElementById("modal-invoice").style.display = "none";
+    }
+
+    window.onload = function () {
         loadData();
     };
 </script>
