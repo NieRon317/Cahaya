@@ -42,6 +42,34 @@
         .btn-teal:hover { background-color: #117a65; }
         .btn-small { padding: 6px 12px; font-size: 13px; }
 
+        /* ===== Login ===== */
+        #login-screen { display: none; min-height: 80vh; align-items: center; justify-content: center; }
+        .login-card {
+            background: #fff; width: 100%; max-width: 380px; padding: 30px;
+            border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); text-align: center;
+        }
+        .login-card h2 { border: none; margin-top: 0; padding-bottom: 0; font-size: 22px; }
+        .login-card p { color: #777; font-size: 14px; margin: 5px 0 20px; }
+        .login-card input { text-align: center; font-size: 16px; padding: 12px; margin-bottom: 14px; }
+        .login-card .btn { width: 100%; font-size: 16px; padding: 12px; }
+        #login-pesan { margin-top: 14px; font-size: 14px; font-weight: bold; min-height: 20px; }
+        #login-pesan.err { color: #c0392b; }
+
+        /* ===== Bar user ===== */
+        .userbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #f1f5f9; border: 1px solid #e1e4e8; border-radius: 6px;
+            padding: 10px 15px; margin-bottom: 15px;
+        }
+        .userbar .hello { font-size: 16px; font-weight: bold; color: #2c3e50; }
+        .badge {
+            display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 12px;
+            font-size: 12px; font-weight: bold; color: #fff; background: #7f8c8d; text-transform: capitalize;
+        }
+        .badge.admin { background: #c0392b; }
+        .badge.moderator { background: #2980b9; }
+        .badge.view { background: #27ae60; }
+
         .tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; border-bottom: 2px solid #eaeaea; padding-bottom: 10px; }
         .tab-btn {
             background: #ecf0f1; color: #2c3e50; border: none; padding: 10px 16px;
@@ -63,11 +91,18 @@
         }
         .form-group label { display: block; font-weight: bold; font-size: 13px; color: #555; margin-bottom: 5px; }
         .grid-container {
-            display: grid; grid-template-columns: 2fr 1fr 1fr 80px; gap: 10px;
+            display: grid; grid-template-columns: 2fr 0.8fr 1.1fr 1.1fr 80px; gap: 10px;
             align-items: center; background: #fdfdfd; padding: 10px;
             border-radius: 6px; border: 1px solid #e0e0e0; margin-bottom: 10px;
         }
         .grid-header { font-weight: bold; color: #555; font-size: 13px; }
+        .subtotal { font-weight: bold; text-align: right; padding-right: 6px; color: #2c3e50; }
+        .total-bar {
+            display: flex; justify-content: flex-end; gap: 30px; flex-wrap: wrap;
+            margin-top: 12px; padding: 12px 16px; background: #eef7ee;
+            border: 1px solid #cfe8cf; border-radius: 6px; font-size: 15px;
+        }
+        .total-bar .besar { font-size: 18px; color: #1e7e34; }
         input, select {
             width: 100%; padding: 9px; border: 1px solid #ccc; border-radius: 4px;
             box-sizing: border-box; font-size: 14px;
@@ -122,7 +157,7 @@
 
         @media print {
             body { background: #fff; padding: 0; }
-            .container, .no-print { display: none !important; }
+            .container, .no-print, #login-screen { display: none !important; }
             .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
             .modal-box { box-shadow: none; max-width: 100%; padding: 0; }
             th { background: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -131,11 +166,35 @@
 </head>
 <body>
 
-<div class="container">
-    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v4</span></h2>
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+    <div class="login-card">
+        <h2>📦 Sistem Manajemen Stok Cahaya</h2>
+        <p>Silakan masuk dengan User ID dan Password</p>
+        <form onsubmit="prosesLogin(event)">
+            <input type="text" id="login-user" placeholder="User ID" autocomplete="username"
+                   autocapitalize="off" autocorrect="off" spellcheck="false" required>
+            <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+            <button type="submit" class="btn" id="btn-login">🔑 Masuk</button>
+        </form>
+        <div id="login-pesan"></div>
+    </div>
+</div>
+
+<!-- ================= APLIKASI ================= -->
+<div class="container" id="app" style="display:none;">
+    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v6</span></h2>
+
+    <div class="userbar">
+        <div>
+            <span class="hello" id="hello-text">Hello</span>
+            <span class="badge" id="hello-level"></span>
+        </div>
+        <button class="btn btn-small btn-gray" onclick="logout()">🚪 Keluar</button>
+    </div>
 
     <div class="tabs">
-        <button class="tab-btn active" id="btn-tab-masuk" onclick="bukaTab('tab-masuk')">📥 Barang Masuk</button>
+        <button class="tab-btn" id="btn-tab-masuk" onclick="bukaTab('tab-masuk')">📥 Barang Masuk</button>
         <button class="tab-btn" id="btn-tab-keluar" onclick="bukaTab('tab-keluar')">📤 Barang Keluar</button>
         <button class="tab-btn" id="btn-tab-riwayat" onclick="bukaTab('tab-riwayat')">🧾 Cetak Invoice</button>
         <button class="tab-btn" id="btn-tab-stok" onclick="bukaTab('tab-stok')">📊 Stok Gudang</button>
@@ -145,7 +204,7 @@
     <div id="status-message"></div>
 
     <!-- ================= TAB BARANG MASUK ================= -->
-    <div id="tab-masuk" class="tab-panel active">
+    <div id="tab-masuk" class="tab-panel">
         <div class="form-card">
             <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
             <form id="form-barang-masuk" onsubmit="submitData(event)">
@@ -173,10 +232,16 @@
                     <div class="grid-header">Nama Barang (Dropdown)</div>
                     <div class="grid-header">Jumlah Masuk</div>
                     <div class="grid-header">Harga Beli Satuan (Rp)</div>
+                    <div class="grid-header num">Subtotal</div>
                     <div class="grid-header">Aksi</div>
                 </div>
 
                 <div id="container-item-list"></div>
+
+                <div class="total-bar">
+                    <span>Total Qty: <strong id="masuk-total-qty">0</strong></span>
+                    <span>Total Harga Barang: <strong class="besar" id="masuk-total-harga">Rp 0</strong></span>
+                </div>
 
                 <div style="margin-top: 20px;">
                     <button type="submit" id="btn-simpan" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
@@ -219,10 +284,16 @@
                     <div class="grid-header">Nama Barang (stok tersedia)</div>
                     <div class="grid-header">Jumlah Keluar</div>
                     <div class="grid-header">Harga Jual Satuan (Rp)</div>
+                    <div class="grid-header num">Subtotal</div>
                     <div class="grid-header">Aksi</div>
                 </div>
 
                 <div id="container-keluar-list"></div>
+
+                <div class="total-bar">
+                    <span>Total Qty: <strong id="keluar-total-qty">0</strong></span>
+                    <span>Total Harga Barang: <strong class="besar" id="keluar-total-harga">Rp 0</strong></span>
+                </div>
 
                 <div style="margin-top: 20px;">
                     <button type="submit" id="btn-simpan-keluar" class="btn btn-orange">📤 Simpan Barang Keluar</button>
@@ -312,12 +383,21 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
     const NAMA_TOKO = "CAHAYA";   // tampil di kop invoice / surat jalan
 
+    // tab yang boleh dibuka per level (server juga mengecek ulang, ini hanya untuk tampilan)
+    const TAB_LEVEL = {
+        admin:     ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok"],
+        moderator: ["tab-riwayat", "tab-stok"],
+        view:      ["tab-stok"]
+    };
+    const SEMUA_TAB = ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok"];
+
+    let sesi = null;   // { user, nama, level }
     let globalListBarang = [];
     let globalRiwayat = [];
     let lastInvoice = null;
     let statusTimer = null;
 
-    // penanda kiriman (anti transaksi dobel): id yang sama dipakai ulang selama isi form tidak berubah
+    // penanda kiriman (anti transaksi dobel)
     let pendingMasuk = { sig: "", id: "" };
     let pendingKeluar = { sig: "", id: "" };
 
@@ -354,20 +434,108 @@
         if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
         return "r" + Date.now() + "-" + Math.random().toString(36).slice(2, 10);
     }
-    // "2026-10-14 10:05" -> "14 Oktober 2026" (tanpa jam)
     function tglCetak(s) {
         let m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || "");
         if (!m) return s || "";
         let bln = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
         return parseInt(m[3], 10) + " " + bln[parseInt(m[2], 10) - 1] + " " + m[1];
     }
-    // IV.CHY/2026.10.14/001 -> SJ.CHY/2026.10.14/001
     function nomorSJ(no) {
         return String(no || "-").replace(/^IV\.CHY/, "SJ.CHY").replace(/^OUT/, "SJ.CHY");
     }
+    function simpanSesi(id) { try { sessionStorage.setItem("cahaya_uid", id); } catch (e) {} }
+    function ambilSesi() { try { return sessionStorage.getItem("cahaya_uid") || ""; } catch (e) { return ""; } }
+    function hapusSesi() { try { sessionStorage.removeItem("cahaya_uid"); } catch (e) {} }
+
+    // ---------- login / logout ----------
+    function pesanLogin(teks, error) {
+        let el = document.getElementById("login-pesan");
+        el.textContent = teks;
+        el.className = error ? "err" : "";
+    }
+    function tampilkanLogin(pesan) {
+        document.getElementById("app").style.display = "none";
+        document.getElementById("login-screen").style.display = "flex";
+        document.getElementById("login-user").value = "";
+        document.getElementById("login-pass").value = "";
+        pesanLogin(pesan || "", !!pesan);
+        document.getElementById("login-user").focus();
+    }
+
+    async function prosesLogin(event) {
+        event.preventDefault();
+        let id = document.getElementById("login-user").value.trim();
+        let pass = document.getElementById("login-pass").value;
+        if (!id || !pass) return;
+
+        let btn = document.getElementById("btn-login");
+        btn.disabled = true; btn.textContent = "⏳ Memeriksa...";
+        pesanLogin("", false);
+
+        try {
+            let res = await kirimPost({ aksi: "login", user_id: id, password: pass });
+            if (res.status === "success") {
+                simpanSesi(res.token);
+                masukAplikasi(Object.assign({}, res.user, { token: res.token }));
+            } else {
+                pesanLogin("❌ " + res.message, true);
+            }
+        } catch (error) {
+            pesanLogin("❌ Gagal terhubung ke server. Periksa koneksi internet lalu coba lagi.", true);
+        } finally {
+            btn.disabled = false; btn.textContent = "🔑 Masuk";
+            document.getElementById("login-pass").value = "";
+        }
+    }
+
+    function masukAplikasi(user) {
+        sesi = user;
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        document.getElementById("hello-text").textContent = "Hello " + user.nama;
+        let badge = document.getElementById("hello-level");
+        badge.textContent = user.level;
+        badge.className = "badge " + user.level;
+
+        let izin = TAB_LEVEL[user.level] || ["tab-stok"];
+        SEMUA_TAB.forEach(id => {
+            document.getElementById("btn-" + id).style.display = izin.indexOf(id) >= 0 ? "" : "none";
+        });
+        bukaTab(izin[0]);
+        loadData();
+    }
+
+    function logout(pesan, tanpaServer) {
+        // beritahu server supaya token sesi langsung dihapus
+        if (sesi && sesi.token && !tanpaServer) {
+            kirimPost({ aksi: "logout" }).catch(() => {});
+        }
+        sesi = null;
+        hapusSesi();
+        globalListBarang = []; globalRiwayat = []; lastInvoice = null;
+        pendingMasuk = { sig: "", id: "" }; pendingKeluar = { sig: "", id: "" };
+
+        tutupInvoice();
+        document.getElementById("form-barang-masuk").reset();
+        document.getElementById("form-barang-keluar").reset();
+        document.getElementById("container-item-list").innerHTML = "";
+        document.getElementById("container-keluar-list").innerHTML = "";
+        document.getElementById("tabel-stok-body").innerHTML = "";
+        document.getElementById("tabel-riwayat-body").innerHTML = "";
+        document.getElementById("hasil-keluar").style.display = "none";
+        document.getElementById("status-message").style.display = "none";
+
+        tampilkanLogin(typeof pesan === "string" ? pesan : "");
+    }
 
     // ---------- tab ----------
+    function tabBoleh(id) {
+        let izin = sesi ? (TAB_LEVEL[sesi.level] || ["tab-stok"]) : [];
+        return izin.indexOf(id) >= 0;
+    }
     function bukaTab(id) {
+        if (!tabBoleh(id)) return;
         document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.getElementById(id).classList.add("active");
@@ -379,21 +547,83 @@
         if (document.getElementById("tab-riwayat").classList.contains("active")) loadRiwayat();
     }
 
+    // ---------- kirim ke server ----------
+    async function kirimPost(payload) {
+        if (payload.aksi !== "login" && sesi) payload.token = sesi.token;
+        let aman = Object.assign({}, payload);   // password & token tidak ditulis utuh ke log debug
+        if (aman.password) aman.password = "***";
+        if (aman.token) aman.token = String(aman.token).substring(0, 6) + "...";
+        debug("KIRIM POST: " + JSON.stringify(aman));
+
+        let ctrl = new AbortController();
+        let timer = setTimeout(() => ctrl.abort(), 45000);
+        let response;
+        try {
+            response = await fetch(SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload),
+                signal: ctrl.signal
+            });
+        } finally {
+            clearTimeout(timer);
+        }
+        let raw = await response.text();
+        debug("BALASAN SERVER (HTTP " + response.status + "):\n" + raw.substring(0, 1500));
+
+        let res;
+        try { res = JSON.parse(raw); }
+        catch (e) {
+            return { status: "error", message: "Server tidak membalas JSON. Kemungkinan script belum di-deploy ulang / URL salah." };
+        }
+        // user dinonaktifkan / tidak valid saat sedang login -> keluarkan
+        if (res.code === "auth" && payload.aksi !== "login" && sesi) {
+            logout(res.message, true);
+        }
+        return res;
+    }
+
+    // kirim dengan perlindungan dobel
+    async function kirimAman(payload, state) {
+        let sig = JSON.stringify(payload);
+        if (state.sig !== sig) { state.sig = sig; state.id = buatId(); }
+        payload.request_id = state.id;
+
+        let result = await kirimPost(payload);
+        if (result.status === "duplikat") {
+            if (confirm("⚠️ " + result.message + "\n\nTetap simpan lagi?")) {
+                payload.paksa = true;
+                result = await kirimPost(payload);
+            } else {
+                return { status: "batal", message: "Dibatalkan. Tidak ada data yang disimpan." };
+            }
+        }
+        return result;
+    }
+
+    function pesanKoneksi(error) {
+        let sebab = error.name === "AbortError" ? "koneksi terlalu lama" : error.message;
+        return "❌ Koneksi terganggu (" + sebab + "). Data MUNGKIN sudah tersimpan. " +
+               "Silakan tekan tombol Simpan sekali lagi, sistem otomatis mencegah data tersimpan dobel.";
+    }
+
     // ---------- load data stok ----------
     async function loadData() {
         let tbodyStok = document.getElementById("tabel-stok-body");
         tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align: center;">Memuat data...</td></tr>';
 
         try {
-            let response = await fetch(SCRIPT_URL);
-            let result = await response.json();
+            let result = await kirimPost({ aksi: "data" });
+            if (!sesi) return; // sudah logout
 
             if (result.status === "success") {
                 globalListBarang = result.listBarang || [];
                 segarkanDropdown();
 
-                if (document.getElementById("container-item-list").children.length === 0) tambahBarisItem();
-                if (document.getElementById("container-keluar-list").children.length === 0) tambahBarisKeluar();
+                if (sesi.level === "admin") {
+                    if (document.getElementById("container-item-list").children.length === 0) tambahBarisItem();
+                    if (document.getElementById("container-keluar-list").children.length === 0) tambahBarisKeluar();
+                }
 
                 tbodyStok.innerHTML = "";
                 if (!result.dataStok || result.dataStok.length === 0) {
@@ -411,15 +641,14 @@
                         tbodyStok.appendChild(tr);
                     });
                 }
-                debug("GET OK: " + globalListBarang.length + " barang, " + (result.dataStok || []).length + " baris stok");
+                debug("DATA OK: " + (result.dataStok || []).length + " baris stok");
             } else {
-                showStatus("Gagal memuat data dari server: " + (result.message || ""), "error");
-                debug("GET gagal: " + JSON.stringify(result));
+                tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">' + esc(result.message || "Gagal memuat data") + '</td></tr>';
             }
         } catch (error) {
             console.error("Error:", error);
             tbodyStok.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
-            debug("GET error: " + error.message);
+            debug("DATA error: " + error.message);
         }
     }
 
@@ -454,6 +683,32 @@
         });
     }
 
+    // ---------- hitung total harga ----------
+    function hitungTotal(cfg) {
+        let totalQty = 0, total = 0;
+        let pakai = cfg.pakaiHarga();
+        document.querySelectorAll(cfg.row).forEach(row => {
+            let jml = parseFloat(row.querySelector(cfg.jumlah).value) || 0;
+            let harga = pakai ? angka(row.querySelector(cfg.harga).value) : 0;
+            let sub = jml * harga;
+            row.querySelector(".subtotal").textContent = pakai ? rp(sub) : "-";
+            if (row.querySelector(cfg.barang).value) { totalQty += jml; total += sub; }
+        });
+        document.getElementById(cfg.idQty).textContent = totalQty;
+        document.getElementById(cfg.idTotal).textContent = pakai ? rp(total) : "-";
+    }
+    const CFG_MASUK = {
+        row: ".item-row", barang: ".input-nama-barang", jumlah: ".input-jumlah", harga: ".input-harga",
+        idQty: "masuk-total-qty", idTotal: "masuk-total-harga", pakaiHarga: () => true
+    };
+    const CFG_KELUAR = {
+        row: ".keluar-row", barang: ".keluar-barang", jumlah: ".keluar-jumlah", harga: ".keluar-harga",
+        idQty: "keluar-total-qty", idTotal: "keluar-total-harga",
+        pakaiHarga: () => document.getElementById("tipe_keluar").value === "Penjualan"
+    };
+    function hitungMasuk() { hitungTotal(CFG_MASUK); }
+    function hitungKeluar() { hitungTotal(CFG_KELUAR); }
+
     // ---------- barang masuk ----------
     function tambahBarisItem() {
         let container = document.getElementById("container-item-list");
@@ -461,67 +716,19 @@
         rowDiv.className = "grid-container item-row";
         rowDiv.style.marginBottom = "8px";
         rowDiv.innerHTML = `
-            <div><select class="input-nama-barang" required>${opsiMasuk()}</select></div>
-            <div><input type="number" class="input-jumlah" min="1" value="1" required></div>
-            <div><input type="text" class="input-harga" value="0" onkeyup="formatRupiah(this)" required></div>
+            <div><select class="input-nama-barang" onchange="hitungMasuk()" required>${opsiMasuk()}</select></div>
+            <div><input type="number" class="input-jumlah" min="1" value="1" oninput="hitungMasuk()" required></div>
+            <div><input type="text" class="input-harga" value="0" oninput="formatRupiah(this); hitungMasuk()" required></div>
+            <div class="subtotal">Rp 0</div>
             <div><button type="button" class="btn btn-danger" onclick="hapusBarisItem(this)">Hapus</button></div>
         `;
         container.appendChild(rowDiv);
+        hitungMasuk();
     }
     function hapusBarisItem(button) {
         let container = document.getElementById("container-item-list");
-        if (container.children.length > 1) button.closest(".item-row").remove();
+        if (container.children.length > 1) { button.closest(".item-row").remove(); hitungMasuk(); }
         else alert("Minimal harus ada 1 item barang dalam transaksi!");
-    }
-
-    // ---------- kirim POST ----------
-    async function kirimPost(payload) {
-        debug("KIRIM POST: " + JSON.stringify(payload));
-        let ctrl = new AbortController();
-        let timer = setTimeout(() => ctrl.abort(), 45000);
-        let response;
-        try {
-            response = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify(payload),
-                signal: ctrl.signal
-            });
-        } finally {
-            clearTimeout(timer);
-        }
-        let raw = await response.text();
-        debug("BALASAN SERVER (HTTP " + response.status + "):\n" + raw.substring(0, 1500));
-        try { return JSON.parse(raw); }
-        catch (e) {
-            return { status: "error", message: "Server tidak membalas JSON. Kemungkinan script belum di-deploy ulang / URL salah." };
-        }
-    }
-
-    // kirim dengan perlindungan dobel:
-    //  - id yang sama dipakai ulang kalau isi form belum berubah (kiriman ulang aman)
-    //  - kalau server curiga transaksi sama persis, tanya dulu ke pengguna
-    async function kirimAman(payload, state) {
-        let sig = JSON.stringify(payload);
-        if (state.sig !== sig) { state.sig = sig; state.id = buatId(); }
-        payload.request_id = state.id;
-
-        let result = await kirimPost(payload);
-        if (result.status === "duplikat") {
-            if (confirm("⚠️ " + result.message + "\n\nTetap simpan lagi?")) {
-                payload.paksa = true;
-                result = await kirimPost(payload);
-            } else {
-                return { status: "batal", message: "Dibatalkan. Tidak ada data yang disimpan." };
-            }
-        }
-        return result;
-    }
-
-    function pesanKoneksi(error) {
-        let sebab = error.name === "AbortError" ? "koneksi terlalu lama" : error.message;
-        return "❌ Koneksi terganggu (" + sebab + "). Data MUNGKIN sudah tersimpan. " +
-               "Silakan tekan tombol Simpan sekali lagi, sistem otomatis mencegah data tersimpan dobel.";
     }
 
     async function submitData(event) {
@@ -551,7 +758,8 @@
         try {
             let result = await kirimAman(payload, pendingMasuk);
             if (result.status === "success") {
-                showStatus("✅ " + (result.message || "Berhasil disimpan"), "success", result.duplikat ? 9000 : 4000);
+                let tambahan = (result.total !== undefined) ? " • Total " + rp(result.total) : "";
+                showStatus("✅ " + (result.message || "Berhasil disimpan") + tambahan, "success", result.duplikat ? 9000 : 6000);
                 pendingMasuk = { sig: "", id: "" };
                 document.getElementById("form-barang-masuk").reset();
                 document.getElementById("container-item-list").innerHTML = "";
@@ -578,16 +786,18 @@
         rowDiv.className = "grid-container keluar-row";
         rowDiv.style.marginBottom = "8px";
         rowDiv.innerHTML = `
-            <div><select class="keluar-barang" required>${opsiKeluar()}</select></div>
-            <div><input type="number" class="keluar-jumlah" min="1" value="1" required></div>
-            <div><input type="text" class="keluar-harga" value="0" onkeyup="formatRupiah(this)" ${isJual ? "" : "disabled"}></div>
+            <div><select class="keluar-barang" onchange="hitungKeluar()" required>${opsiKeluar()}</select></div>
+            <div><input type="number" class="keluar-jumlah" min="1" value="1" oninput="hitungKeluar()" required></div>
+            <div><input type="text" class="keluar-harga" value="0" oninput="formatRupiah(this); hitungKeluar()" ${isJual ? "" : "disabled"}></div>
+            <div class="subtotal">Rp 0</div>
             <div><button type="button" class="btn btn-danger" onclick="hapusBarisKeluar(this)">Hapus</button></div>
         `;
         container.appendChild(rowDiv);
+        hitungKeluar();
     }
     function hapusBarisKeluar(button) {
         let container = document.getElementById("container-keluar-list");
-        if (container.children.length > 1) button.closest(".keluar-row").remove();
+        if (container.children.length > 1) { button.closest(".keluar-row").remove(); hitungKeluar(); }
         else alert("Minimal harus ada 1 item barang dalam transaksi!");
     }
     function terapkanTipe() {
@@ -596,6 +806,7 @@
             inp.disabled = !isJual;
             if (!isJual) inp.value = "0";
         });
+        hitungKeluar();
     }
 
     async function submitKeluar(event) {
@@ -645,7 +856,7 @@
             let result = await kirimAman(payload, pendingKeluar);
             if (result.status === "success") {
                 lastInvoice = result.invoice;
-                showStatus("✅ " + result.message, "success", 9000);
+                showStatus("✅ " + result.message + (tipe === "Penjualan" ? " • Total " + rp(result.invoice.total) : ""), "success", 9000);
                 document.getElementById("hasil-keluar-teks").textContent =
                     (result.duplikat ? "ℹ️ Sudah tersimpan sebelumnya (tidak dobel): " : "✅ Tersimpan sebagai ") + result.invoice.no_invoice + "  ";
                 document.getElementById("hasil-keluar").style.display = "block";
@@ -672,15 +883,14 @@
         let tbody = document.getElementById("tabel-riwayat-body");
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Memuat data...</td></tr>';
         try {
-            let response = await fetch(SCRIPT_URL + "?aksi=riwayat_keluar");
-            let result = await response.json();
+            let result = await kirimPost({ aksi: "riwayat_keluar" });
+            if (!sesi) return;
             if (result.status === "success") {
                 globalRiwayat = result.riwayat || [];
                 debug("RIWAYAT OK: " + globalRiwayat.length + " invoice");
                 renderRiwayat();
             } else {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;">Gagal: ' + esc(result.message) + '</td></tr>';
-                debug("RIWAYAT gagal: " + JSON.stringify(result));
             }
         } catch (error) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;">Gagal terhubung ke Google Sheets.</td></tr>';
@@ -804,12 +1014,31 @@
         document.getElementById("modal-invoice").style.display = "none";
     }
 
-    window.onload = function () {
-        // panel debug tersembunyi, tampil hanya jika alamat web diakhiri ?debug=1
+    // ---------- start ----------
+    window.onload = async function () {
         if (new URLSearchParams(location.search).get("debug") === "1") {
             document.getElementById("debug-wrap").style.display = "block";
         }
-        loadData();
+
+        // coba lanjutkan sesi (selama tab browser belum ditutup), tetap diverifikasi ke server
+        let tersimpan = ambilSesi();
+        if (tersimpan) {
+            document.getElementById("login-screen").style.display = "flex";
+            pesanLogin("⏳ Memeriksa sesi...", false);
+            try {
+                let res = await kirimPost({ aksi: "sesi", token: tersimpan });
+                if (res.status === "success") {
+                    masukAplikasi(Object.assign({}, res.user, { token: tersimpan }));
+                    return;
+                }
+                hapusSesi();
+                tampilkanLogin(res.message);
+            } catch (e) {
+                tampilkanLogin("Koneksi gagal. Silakan login kembali.");
+            }
+        } else {
+            tampilkanLogin("");
+        }
     };
 </script>
 
