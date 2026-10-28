@@ -155,12 +155,62 @@
         .inv-sign div.kolom { width: 200px; }
         .inv-sign .garis { border-top: 1px solid #333; margin-top: 75px; }
 
+        /* ===== Invoice format baru ===== */
+        .iv-doc { font-family: Calibri, Carlito, 'Segoe UI', Arial, sans-serif; color: #000; font-size: 13px; }
+        .iv-title { text-align: center; font-size: 30px; font-weight: 800; letter-spacing: 3px; margin: 0 0 14px; }
+        .iv-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 22px; }
+        .iv-judul { font-size: 28px; font-weight: 800; font-style: italic; margin-bottom: 14px; }
+        .iv-kepada { width: 360px; max-width: 100%; }
+        .iv-kepada .lbl { margin-bottom: 2px; }
+        .iv-kepada .baris { border-bottom: 1px solid #000; padding: 3px 0 2px; min-height: 17px; }
+        .iv-box { width: 320px; border-collapse: collapse; margin: 0; }
+        .iv-box td { border: 1px solid #000; padding: 4px 8px; width: 50%; vertical-align: top; height: 38px; font-size: 13px; }
+        .iv-tabel { width: 100%; border-collapse: collapse; margin-top: 0; table-layout: fixed; }
+        .iv-tabel th, .iv-tabel td { border: 1px solid #000; padding: 3px 6px; font-size: 13px; height: 22px; }
+        .iv-tabel th { background: #fff; color: #000; font-weight: normal; text-align: center; }
+        .iv-tabel tr:nth-child(even) { background: #fff; }
+        .iv-tabel .c { text-align: center; }
+        .iv-tabel .tanpa { border: none; }
+        .iv-tabel .tlabel { text-align: right; font-weight: bold; }
+        .rp { display: flex; justify-content: space-between; gap: 6px; }
+        .iv-terbilang { border: 1px solid #000; width: 54%; padding: 6px 8px; margin-top: 16px; }
+        .iv-hormat { margin: 16px 0 0 30px; }
+        .iv-hormat .garis { width: 200px; border-top: 1px solid #000; margin-top: 90px; }
+
+        /* ===== Report ===== */
+        .report-loading { text-align: center; padding: 30px; color: #666; }
+        .rep-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: #777; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .kpi { background: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 8px; padding: 14px; }
+        .kpi-label { font-size: 12px; color: #666; font-weight: bold; }
+        .kpi-val { font-size: 20px; font-weight: bold; color: #2c3e50; margin-top: 4px; }
+        .kpi-sub { font-size: 12px; color: #888; margin-top: 2px; }
+        .rep-box { border: 1px solid #e1e4e8; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; }
+        .rep-box h4 { margin: 0 0 8px; color: #2c3e50; }
+        .rep-controls { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; background: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+        .rep-controls label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .rep-controls input[type=radio] { width: auto; }
+        .rep-controls select, .rep-controls input[type=text] { width: auto; min-width: 190px; }
+        .rep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 14px; }
+        .rep-card { border: 1px solid #e1e4e8; border-radius: 8px; padding: 10px 12px; background: #fff; }
+        .rep-card-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+        .rep-unit { font-size: 12px; color: #888; }
+        .rep-stat { font-size: 12.5px; color: #555; margin-top: 4px; line-height: 1.5; }
+        .bdg { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+        .bdg.merah { background: #f8d7da; color: #721c24; }
+        .bdg.kuning { background: #fff3cd; color: #856404; }
+        .bdg.hijau { background: #d4edda; color: #155724; }
+        .bdg.abu { background: #e9ecef; color: #555; }
+
+        /* margin halaman 0 = browser tidak mencetak alamat web / judul / tanggal di tepi kertas */
+        @page { size: A4 portrait; margin: 0; }
         @media print {
-            body { background: #fff; padding: 0; }
+            body { background: #fff; padding: 0; margin: 0; }
             .container, .no-print, #login-screen { display: none !important; }
-            .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
-            .modal-box { box-shadow: none; max-width: 100%; padding: 0; }
+            .modal-overlay { position: static; background: none; padding: 0; display: block !important; overflow: visible; }
+            .modal-box { box-shadow: none; max-width: 100%; margin: 0; border-radius: 0; padding: 14mm 14mm 12mm; }
             th { background: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .iv-tabel th { background: #fff !important; }
         }
     </style>
 </head>
@@ -183,7 +233,7 @@
 
 <!-- ================= APLIKASI ================= -->
 <div class="container" id="app" style="display:none;">
-    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v6</span></h2>
+    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi">v7</span></h2>
 
     <div class="userbar">
         <div>
@@ -198,6 +248,7 @@
         <button class="tab-btn" id="btn-tab-keluar" onclick="bukaTab('tab-keluar')">📤 Barang Keluar</button>
         <button class="tab-btn" id="btn-tab-riwayat" onclick="bukaTab('tab-riwayat')">🧾 Cetak Invoice</button>
         <button class="tab-btn" id="btn-tab-stok" onclick="bukaTab('tab-stok')">📊 Stok Gudang</button>
+        <button class="tab-btn" id="btn-tab-report" onclick="bukaTab('tab-report')">📈 Report</button>
         <button class="btn btn-small" style="margin-left:auto;" onclick="refreshSemua()">🔄 Refresh Data</button>
     </div>
 
@@ -272,6 +323,10 @@
                     <div class="form-group">
                         <label>Catatan (opsional)</label>
                         <input type="text" id="catatan_keluar" placeholder="Contoh: bayar cash">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Alamat / Kota (opsional, tampil di invoice &amp; surat jalan)</label>
+                        <input type="text" id="alamat_pelanggan" placeholder="Contoh: Padang">
                     </div>
                 </div>
 
@@ -362,6 +417,12 @@
         </table>
     </div>
 
+    <!-- ================= TAB REPORT (admin) ================= -->
+    <div id="tab-report" class="tab-panel">
+        <h3>📈 Report Penjualan &amp; Planning Stok</h3>
+        <div id="report-isi"><div class="report-loading">Buka tab ini untuk memuat data...</div></div>
+    </div>
+
     <div id="debug-wrap">
         <h3>🛠️ Debug (balasan asli dari server)</h3>
         <div id="debug-box">belum ada aktivitas...</div>
@@ -381,15 +442,17 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
+    const VERSI_SERVER = "v7";    // versi script Google yang dibutuhkan website ini
+    const JUDUL_ASLI = document.title;
     const NAMA_TOKO = "CAHAYA";   // tampil di kop invoice / surat jalan
 
     // tab yang boleh dibuka per level (server juga mengecek ulang, ini hanya untuk tampilan)
     const TAB_LEVEL = {
-        admin:     ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok"],
+        admin:     ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok", "tab-report"],
         moderator: ["tab-riwayat", "tab-stok"],
         view:      ["tab-stok"]
     };
-    const SEMUA_TAB = ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok"];
+    const SEMUA_TAB = ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok", "tab-report"];
 
     let sesi = null;   // { user, nama, level }
     let globalListBarang = [];
@@ -453,6 +516,21 @@
         el.textContent = teks;
         el.className = error ? "err" : "";
     }
+    // pastikan script Google sudah versi terbaru sebelum login
+    async function cekVersiServer() {
+        try {
+            let r = await fetch(SCRIPT_URL);
+            let j = await r.json();
+            if (j.versi !== VERSI_SERVER) {
+                document.getElementById("login-screen").style.display = "flex";
+                pesanLogin("⚠️ Server (Google Apps Script) masih memakai kode lama. Paste Code.gs terbaru, lalu Deploy → Manage deployments → ✏️ → New version → Deploy.", true);
+                document.getElementById("btn-login").disabled = true;
+                return false;
+            }
+        } catch (e) { /* gagal cek: biarkan proses login yang menampilkan error koneksi */ }
+        return true;
+    }
+
     function tampilkanLogin(pesan) {
         document.getElementById("app").style.display = "none";
         document.getElementById("login-screen").style.display = "flex";
@@ -474,9 +552,11 @@
 
         try {
             let res = await kirimPost({ aksi: "login", user_id: id, password: pass });
-            if (res.status === "success") {
+            if (res.status === "success" && res.token && res.user && res.user.level) {
                 simpanSesi(res.token);
                 masukAplikasi(Object.assign({}, res.user, { token: res.token }));
+            } else if (res.status === "success") {
+                pesanLogin("❌ Balasan server tidak sesuai. Kemungkinan script di Google belum diperbarui (Deploy → Manage deployments → New version).", true);
             } else {
                 pesanLogin("❌ " + res.message, true);
             }
@@ -523,6 +603,8 @@
         document.getElementById("container-keluar-list").innerHTML = "";
         document.getElementById("tabel-stok-body").innerHTML = "";
         document.getElementById("tabel-riwayat-body").innerHTML = "";
+        document.getElementById("report-isi").innerHTML = "";
+        reportData = null;
         document.getElementById("hasil-keluar").style.display = "none";
         document.getElementById("status-message").style.display = "none";
 
@@ -541,10 +623,12 @@
         document.getElementById(id).classList.add("active");
         document.getElementById("btn-" + id).classList.add("active");
         if (id === "tab-riwayat") loadRiwayat();
+        if (id === "tab-report") loadReport(false);
     }
     function refreshSemua() {
         loadData();
         if (document.getElementById("tab-riwayat").classList.contains("active")) loadRiwayat();
+        if (document.getElementById("tab-report").classList.contains("active")) loadReport(false);
     }
 
     // ---------- kirim ke server ----------
@@ -842,6 +926,7 @@
         let payload = {
             aksi: "barang_keluar",
             nama_pelanggan: document.getElementById("nama_pelanggan").value,
+            alamat: document.getElementById("alamat_pelanggan").value,
             tipe_keluar: tipe,
             catatan: document.getElementById("catatan_keluar").value,
             items: items
@@ -948,46 +1033,117 @@
         renderRiwayat();
     }
 
+    // ---------- terbilang (angka -> kata) ----------
+    function terbilangAngka(n) {
+        const s = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+        n = Math.floor(n);
+        if (n < 12) return s[n];
+        if (n < 20) return terbilangAngka(n - 10) + " belas";
+        if (n < 100) return terbilangAngka(Math.floor(n / 10)) + " puluh" + (n % 10 ? " " + terbilangAngka(n % 10) : "");
+        if (n < 200) return "seratus" + (n - 100 ? " " + terbilangAngka(n - 100) : "");
+        if (n < 1000) return terbilangAngka(Math.floor(n / 100)) + " ratus" + (n % 100 ? " " + terbilangAngka(n % 100) : "");
+        if (n < 2000) return "seribu" + (n - 1000 ? " " + terbilangAngka(n - 1000) : "");
+        if (n < 1e6) return terbilangAngka(Math.floor(n / 1e3)) + " ribu" + (n % 1e3 ? " " + terbilangAngka(n % 1e3) : "");
+        if (n < 1e9) return terbilangAngka(Math.floor(n / 1e6)) + " juta" + (n % 1e6 ? " " + terbilangAngka(n % 1e6) : "");
+        if (n < 1e12) return terbilangAngka(Math.floor(n / 1e9)) + " miliar" + (n % 1e9 ? " " + terbilangAngka(n % 1e9) : "");
+        return terbilangAngka(Math.floor(n / 1e12)) + " triliun" + (n % 1e12 ? " " + terbilangAngka(n % 1e12) : "");
+    }
+    function terbilangRupiah(n) {
+        n = Math.round(Number(n) || 0);
+        if (n <= 0) return "Nol rupiah";
+        let t = terbilangAngka(n).trim();
+        return t.charAt(0).toUpperCase() + t.slice(1) + " rupiah";
+    }
+
     // ---------- dokumen cetak: invoice & surat jalan ----------
-    function bukaDokumen(inv, jenis) {
-        if (!inv) return;
-        let isSJ = jenis === "sj";
-        let isJual = inv.tipe === "Penjualan";
+    function rpTabel(n) {
+        return '<div class="rp"><span>Rp.</span><span>' + Number(n || 0).toLocaleString("id-ID") + ',-</span></div>';
+    }
 
-        let judul = isSJ ? "Bukti Barang Keluar" : "Invoice";
-        let nomor = isSJ ? nomorSJ(inv.no_invoice) : inv.no_invoice;
-
-        let thead, baris;
-        if (isSJ) {
-            thead = `<tr><th style="width:50px;">No</th><th>Nama Barang</th><th class="num" style="width:110px;">Jumlah</th></tr>`;
-            baris = inv.items.map((it, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${esc(it.nama)}</td>
-                    <td class="num">${it.jumlah}</td>
-                </tr>`).join("");
-        } else {
-            thead = `<tr><th style="width:50px;">No</th><th>Nama Barang</th><th class="num">Jumlah</th><th class="num">Harga</th><th class="num">Subtotal</th></tr>`;
-            baris = inv.items.map((it, i) => `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${esc(it.nama)}</td>
-                    <td class="num">${it.jumlah}</td>
-                    <td class="num">${isJual ? rp(it.harga) : "-"}</td>
-                    <td class="num">${isJual ? rp(it.total) : "-"}</td>
-                </tr>`).join("");
-            if (isJual) {
-                baris += `<tr class="inv-total"><td colspan="4" class="num">TOTAL</td><td class="num">${rp(inv.total)}</td></tr>`;
-            }
+    function htmlInvoice(inv, isJual) {
+        const MIN_BARIS = 12;
+        let baris = inv.items.map((it, i) => `
+            <tr>
+                <td class="c">${i + 1}.</td>
+                <td>${esc(it.nama)}</td>
+                <td class="c">${esc(String(it.jumlah).replace(".", ","))}</td>
+                <td>${isJual ? rpTabel(it.harga) : '<div class="c">-</div>'}</td>
+                <td>${isJual ? rpTabel(it.total) : '<div class="c">-</div>'}</td>
+            </tr>`);
+        for (let i = inv.items.length; i < MIN_BARIS; i++) {
+            baris.push('<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>');
         }
 
-        let kiri = isSJ ? "Pengirim" : "Dibuat oleh";
+        let totalRow = isJual ? `
+            <tfoot><tr>
+                <td colspan="3" class="tanpa"></td>
+                <td class="tlabel">TOTAL :</td>
+                <td><div class="rp"><b>Rp.</b><b>${Number(inv.total || 0).toLocaleString("id-ID")},-</b></div></td>
+            </tr></tfoot>` : "";
 
-        document.getElementById("invoice-isi").innerHTML = `
+        let terbilang = isJual ? `
+            <div class="iv-terbilang">
+                <div>Terbilang:</div>
+                <div>${esc(terbilangRupiah(inv.total))}</div>
+            </div>` : "";
+
+        return `
+            <div class="iv-doc">
+                <div class="iv-title">${esc(NAMA_TOKO)}</div>
+                <div class="iv-top">
+                    <div>
+                        <div class="iv-judul">INVOICE</div>
+                        <div class="iv-kepada">
+                            <div class="lbl">Kepada:</div>
+                            <div class="baris"><b>${esc(inv.pelanggan)}</b></div>
+                            <div class="baris">${esc(inv.alamat) || "&nbsp;"}</div>
+                        </div>
+                    </div>
+                    <table class="iv-box">
+                        <tr>
+                            <td>Tanggal:<br><b>${esc(tglCetak(inv.tanggal))}</b></td>
+                            <td>Nomor:<br><b>${esc(inv.no_invoice)}</b></td>
+                        </tr>
+                        <tr>
+                            <td>Tanggal Jatuh Tempo:<br>&nbsp;</td>
+                            <td>Surat Jalan No.:<br><b>${esc(nomorSJ(inv.no_invoice))}</b></td>
+                        </tr>
+                    </table>
+                </div>
+                <table class="iv-tabel">
+                    <colgroup>
+                        <col style="width:5%"><col style="width:49%"><col style="width:10%">
+                        <col style="width:17%"><col style="width:19%">
+                    </colgroup>
+                    <thead>
+                        <tr><th>No:</th><th>Nama Barang</th><th>QTY</th><th>@Harga</th><th>Total Harga</th></tr>
+                    </thead>
+                    <tbody>${baris.join("")}</tbody>
+                    ${totalRow}
+                </table>
+                ${terbilang}
+                <div class="iv-hormat">
+                    Hormat kami,
+                    <div class="garis"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function htmlSuratJalan(inv, nomor) {
+        let baris = inv.items.map((it, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${esc(it.nama)}</td>
+                <td class="num">${esc(String(it.jumlah).replace(".", ","))}</td>
+                <td>${esc(it.satuan || "Pcs")}</td>
+            </tr>`).join("");
+
+        return `
             <div class="inv-head">
                 <div>
                     <h1>${esc(NAMA_TOKO)}</h1>
-                    <div class="sub">${judul}</div>
+                    <div class="sub">Bukti Barang Keluar</div>
                 </div>
                 <div class="inv-no">
                     <strong>No. ${esc(nomor)}</strong><br>
@@ -996,22 +1152,233 @@
             </div>
             <table class="inv-meta">
                 <tr><td>Pelanggan / Tujuan</td><td>: ${esc(inv.pelanggan)}</td></tr>
+                ${inv.alamat ? `<tr><td>Alamat</td><td>: ${esc(inv.alamat)}</td></tr>` : ""}
                 <tr><td>Tipe Keluar</td><td>: ${esc(inv.tipe)}</td></tr>
                 ${inv.catatan ? `<tr><td>Catatan</td><td>: ${esc(inv.catatan)}</td></tr>` : ""}
             </table>
             <table>
-                <thead>${thead}</thead>
+                <thead>
+                    <tr><th style="width:50px;">No</th><th>Nama Barang</th><th class="num" style="width:100px;">Jumlah</th><th style="width:100px;">Satuan</th></tr>
+                </thead>
                 <tbody>${baris}</tbody>
             </table>
             <div class="inv-sign">
-                <div class="kolom">${kiri}<div class="garis"></div></div>
+                <div class="kolom">Pengirim<div class="garis"></div></div>
                 <div class="kolom">Penerima<div class="garis"></div></div>
             </div>
         `;
+    }
+
+    function bukaDokumen(inv, jenis) {
+        if (!inv) return;
+        let isSJ = jenis === "sj";
+        let nomor = isSJ ? nomorSJ(inv.no_invoice) : inv.no_invoice;
+
+        document.getElementById("invoice-isi").innerHTML =
+            isSJ ? htmlSuratJalan(inv, nomor) : htmlInvoice(inv, inv.tipe === "Penjualan");
+
+        // judul tab = nama file saat disimpan sebagai PDF
+        document.title = (isSJ ? "Surat Jalan " : "Invoice ") + String(nomor).replace(/[\/\\]/g, "-");
         document.getElementById("modal-invoice").style.display = "block";
     }
     function tutupInvoice() {
         document.getElementById("modal-invoice").style.display = "none";
+        document.title = JUDUL_ASLI;
+    }
+
+    // ---------- report (admin) ----------
+    let reportData = null;
+    let reportMode = "jual";      // "jual" = penjualan saja | "semua" = semua barang keluar
+    let reportUrut = "laris";
+    let reportCari = "";
+    let reportLimit = 60;
+    const BLN = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
+    function kompak(n) {
+        n = Number(n) || 0;
+        let a = Math.abs(n);
+        let f = (x, suf) => (Math.round(x * 10) / 10).toString().replace(".", ",") + suf;
+        if (a >= 1e9) return f(n / 1e9, " M");
+        if (a >= 1e6) return f(n / 1e6, " jt");
+        if (a >= 1e3) return f(n / 1e3, " rb");
+        return (Math.round(n * 10) / 10).toString().replace(".", ",");
+    }
+    function niceMax(v) {
+        if (!(v > 0)) return 1;
+        let e = Math.pow(10, Math.floor(Math.log10(v)));
+        let f = v / e;
+        let steps = [1, 2, 4, 6, 8, 10];
+        let nf = steps.find(x => f <= x) || 10;
+        return nf * e;
+    }
+    function labelBulan(key, pendek) {
+        let p = key.split("-");
+        let nm = BLN[parseInt(p[1], 10) - 1];
+        return pendek ? nm : nm + " " + p[0].slice(2);
+    }
+
+    function barChartSVG(labels, values, opt) {
+        opt = opt || {};
+        let mini = !!opt.mini;
+        let W = mini ? 300 : 1000, H = mini ? 130 : 320;
+        let m = mini ? { l: 6, r: 6, t: 18, b: 20 } : { l: 64, r: 16, t: 24, b: 40 };
+        let fmt = opt.fmt || kompak;
+        let nice = niceMax(Math.max.apply(null, values.concat([0])));
+        let iw = W - m.l - m.r, ih = H - m.t - m.b;
+        let n = values.length, slot = iw / n, bw = slot * (mini ? 0.7 : 0.6);
+        let fs = mini ? 8 : 11;
+
+        let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;display:block;margin:0 auto" role="img" font-family="Segoe UI, Arial, sans-serif">`;
+        if (!mini) {
+            for (let i = 0; i <= 4; i++) {
+                let y = m.t + ih - ih * i / 4;
+                s += `<line x1="${m.l}" y1="${y}" x2="${W - m.r}" y2="${y}" stroke="#e5e8eb"/>`;
+                s += `<text x="${m.l - 8}" y="${y + 4}" text-anchor="end" font-size="${fs}" fill="#777">${esc(fmt(nice * i / 4))}</text>`;
+            }
+        } else {
+            s += `<line x1="${m.l}" y1="${m.t + ih}" x2="${W - m.r}" y2="${m.t + ih}" stroke="#cfd5da"/>`;
+        }
+        values.forEach((v, i) => {
+            let h = nice > 0 ? ih * v / nice : 0;
+            let x = m.l + slot * i + (slot - bw) / 2;
+            let y = m.t + ih - h;
+            let akhir = (i === n - 1);   // bulan berjalan (belum penuh)
+            let warna = akhir ? "#9fc9ec" : (opt.warna || "#3498db");
+            let judul = esc((opt.judulLabel ? opt.judulLabel[i] : labels[i]) + ": " + (opt.tip ? opt.tip(v) : fmt(v)));
+            s += `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h, v > 0 ? 1 : 0)}" fill="${warna}" rx="2" ${akhir ? 'stroke="#2c7fb8" stroke-dasharray="3 2"' : ""}><title>${judul}</title></rect>`;
+            if (v > 0) s += `<text x="${x + bw / 2}" y="${y - 4}" text-anchor="middle" font-size="${fs}" fill="#333">${esc(fmt(v))}</text>`;
+            s += `<text x="${m.l + slot * i + slot / 2}" y="${H - (mini ? 6 : 16)}" text-anchor="middle" font-size="${fs}" fill="${akhir ? "#2c7fb8" : "#666"}">${esc(labels[i])}</text>`;
+        });
+        return s + "</svg>";
+    }
+
+    async function loadReport(segar) {
+        let box = document.getElementById("report-isi");
+        box.innerHTML = '<div class="report-loading">⏳ Menghitung report... (pertama kali bisa beberapa detik)</div>';
+        try {
+            let res = await kirimPost({ aksi: "report", segar: !!segar });
+            if (!sesi) return;
+            if (res.status === "success") {
+                reportData = res;
+                renderReport();
+            } else {
+                box.innerHTML = '<div class="report-loading" style="color:#c0392b;">' + esc(res.message || "Gagal memuat report") + '</div>';
+            }
+        } catch (error) {
+            box.innerHTML = '<div class="report-loading" style="color:#c0392b;">Gagal terhubung ke Google Sheets.</div>';
+            debug("REPORT error: " + error.message);
+        }
+    }
+
+    function renderReport() {
+        let d = reportData;
+        if (!d) return;
+        let n = d.bulan.length;
+        let rp13 = d.penjualan_rp;
+        let labels = d.bulan.map(k => labelBulan(k, false));
+        let ini = rp13[n - 1], lalu = rp13[n - 2];
+        let rata = rp13.slice(0, n - 1).reduce((x, y) => x + y, 0) / (n - 1);
+
+        let pelRows = (d.top_pelanggan || []).map((p, i) => `
+            <tr><td>${i + 1}</td><td>${esc(p.nama)}</td><td class="num">${p.invoice}</td><td class="num">${rp(p.total)}</td></tr>`).join("");
+
+        document.getElementById("report-isi").innerHTML = `
+            <div class="rep-bar">
+                <span>Diperbarui: ${esc(d.diperbarui)} WIB • bulan ${esc(labels[n - 1])} belum penuh (batang paling kanan, putus-putus)</span>
+                <button class="btn btn-small btn-gray" onclick="loadReport(true)">🔄 Muat ulang</button>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi"><div class="kpi-label">Penjualan bulan berjalan (${esc(labels[n - 1])})</div><div class="kpi-val">${rp(ini)}</div><div class="kpi-sub">belum penuh • ${d.jumlah_invoice[n - 1]} invoice</div></div>
+                <div class="kpi"><div class="kpi-label">Penjualan bulan lalu (${esc(labels[n - 2])})</div><div class="kpi-val">${rp(lalu)}</div><div class="kpi-sub">${d.jumlah_invoice[n - 2]} invoice</div></div>
+                <div class="kpi"><div class="kpi-label">Rata-rata per bulan (12 bln penuh)</div><div class="kpi-val">${rp(Math.round(rata))}</div><div class="kpi-sub">${esc(labels[0])} – ${esc(labels[n - 2])}</div></div>
+                <div class="kpi"><div class="kpi-label">Total 12 bulan terakhir</div><div class="kpi-val">${rp(rp13.slice(0, n - 1).reduce((x, y) => x + y, 0))}</div><div class="kpi-sub">hanya tipe Penjualan</div></div>
+            </div>
+
+            <div class="rep-box">
+                <h4>💰 Total Penjualan per Bulan (Rp)</h4>
+                ${barChartSVG(labels, rp13, { fmt: kompak, tip: v => rp(v) })}
+            </div>
+
+            <h3 style="margin-top:28px;">📦 Jumlah Item Terjual per Barang per Bulan</h3>
+            <div class="rep-controls">
+                <label><input type="radio" name="rep-mode" value="jual" ${reportMode === "jual" ? "checked" : ""} onchange="setReportMode(this.value)"> Penjualan saja</label>
+                <label><input type="radio" name="rep-mode" value="semua" ${reportMode === "semua" ? "checked" : ""} onchange="setReportMode(this.value)"> Semua barang keluar (+ pemakaian, rusak, retur)</label>
+                <select id="rep-urut" onchange="setReportUrut(this.value)">
+                    <option value="laris" ${reportUrut === "laris" ? "selected" : ""}>Urut: Terlaris (12 bln)</option>
+                    <option value="restock" ${reportUrut === "restock" ? "selected" : ""}>Urut: Paling perlu restock</option>
+                    <option value="nama" ${reportUrut === "nama" ? "selected" : ""}>Urut: Nama A–Z</option>
+                </select>
+                <input type="text" id="rep-cari" placeholder="Cari barang..." value="${esc(reportCari)}" oninput="setReportCari(this.value)">
+            </div>
+            <div id="rep-grid" class="rep-grid"></div>
+
+            <h3 style="margin-top:28px;">🏆 Top 10 Pelanggan (13 bulan, tipe Penjualan)</h3>
+            <table>
+                <thead><tr><th style="width:50px;">No</th><th>Pelanggan</th><th class="num">Invoice</th><th class="num">Total Penjualan</th></tr></thead>
+                <tbody>${pelRows || '<tr><td colspan="4" style="text-align:center;">Belum ada data.</td></tr>'}</tbody>
+            </table>
+        `;
+        renderBarangGrid();
+    }
+
+    function setReportMode(v) { reportMode = v; reportLimit = 60; renderBarangGrid(); }
+    function setReportUrut(v) { reportUrut = v; reportLimit = 60; renderBarangGrid(); }
+    function setReportCari(v) { reportCari = v; reportLimit = 60; renderBarangGrid(); }
+    function tampilSemuaBarang() { reportLimit = 100000; renderBarangGrid(); }
+
+    function badgeCover(x) {
+        if (x.cover === null) {
+            return x.b.stok > 0 ? '<span class="bdg abu">tidak ada penjualan 3 bln terakhir</span>' : '<span class="bdg abu">stok kosong</span>';
+        }
+        let t = (Math.round(x.cover * 10) / 10).toString().replace(".", ",");
+        if (x.cover < 1) return `<span class="bdg merah">⚠️ cukup ±${t} bln, segera restock</span>`;
+        if (x.cover < 2) return `<span class="bdg kuning">cukup ±${t} bln, siap-siap restock</span>`;
+        return `<span class="bdg hijau">cukup ±${t} bln</span>`;
+    }
+
+    function renderBarangGrid() {
+        let d = reportData;
+        let grid = document.getElementById("rep-grid");
+        if (!d || !grid) return;
+        let n = d.bulan.length;
+        let labelPendek = d.bulan.map(k => labelBulan(k, true));
+        let labelPenuh = d.bulan.map(k => labelBulan(k, false));
+        let cari = reportCari.trim().toLowerCase();
+
+        let list = d.barang.map(b => {
+            let arr = reportMode === "jual" ? b.jual : b.semua;
+            let total12 = 0;
+            for (let i = 0; i < n - 1; i++) total12 += arr[i];
+            let avg3 = (arr[n - 2] + arr[n - 3] + arr[n - 4]) / 3;   // 3 bulan penuh terakhir
+            return { b: b, arr: arr, total12: total12, ini: arr[n - 1], avg3: avg3, cover: avg3 > 0 ? b.stok / avg3 : null };
+        }).filter(x => !cari || String(x.b.nama).toLowerCase().indexOf(cari) >= 0 || String(x.b.sku).toLowerCase().indexOf(cari) >= 0);
+
+        if (reportUrut === "nama") {
+            list.sort((p, q) => String(p.b.nama).localeCompare(String(q.b.nama)));
+        } else if (reportUrut === "restock") {
+            list.sort((p, q) => (p.cover === null ? 1e9 : p.cover) - (q.cover === null ? 1e9 : q.cover));
+        } else {
+            list.sort((p, q) => (q.total12 - p.total12) || (q.ini - p.ini) || String(p.b.nama).localeCompare(String(q.b.nama)));
+        }
+
+        if (list.length === 0) {
+            grid.innerHTML = '<div class="report-loading" style="grid-column:1/-1;">Tidak ada barang yang cocok.</div>';
+            return;
+        }
+
+        let tampil = list.slice(0, reportLimit);
+        grid.innerHTML = tampil.map(x => `
+            <div class="rep-card">
+                <div class="rep-card-head"><strong>${esc(x.b.nama)}</strong><span class="rep-unit">${esc(x.b.satuan)}</span></div>
+                ${barChartSVG(labelPendek, x.arr, { mini: true, fmt: kompak, judulLabel: labelPenuh, tip: v => kompak(v) + " " + x.b.satuan })}
+                <div class="rep-stat">Total 12 bln: <b>${kompak(x.total12)}</b> • Bulan ini: <b>${kompak(x.ini)}</b> • Rata-rata 3 bln: <b>${kompak(x.avg3)}</b>/bln</div>
+                <div class="rep-stat">Stok sekarang: <b>${kompak(x.b.stok)}</b> ${esc(x.b.satuan)} &nbsp; ${badgeCover(x)}</div>
+            </div>`).join("");
+
+        if (list.length > tampil.length) {
+            grid.innerHTML += `<div style="grid-column:1/-1;text-align:center;"><button class="btn btn-small" onclick="tampilSemuaBarang()">Tampilkan semua (${list.length} barang)</button></div>`;
+        }
     }
 
     // ---------- start ----------
@@ -1021,13 +1388,14 @@
         }
 
         // coba lanjutkan sesi (selama tab browser belum ditutup), tetap diverifikasi ke server
+        if (!(await cekVersiServer())) return;
         let tersimpan = ambilSesi();
         if (tersimpan) {
             document.getElementById("login-screen").style.display = "flex";
             pesanLogin("⏳ Memeriksa sesi...", false);
             try {
                 let res = await kirimPost({ aksi: "sesi", token: tersimpan });
-                if (res.status === "success") {
+                if (res.status === "success" && res.user && res.user.level) {
                     masukAplikasi(Object.assign({}, res.user, { token: tersimpan }));
                     return;
                 }
