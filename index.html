@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen Stok Cahaya</title>
+    <link rel="stylesheet" href="css/style.css?v=10">
+    <script>
+        // Versi paket website ini + daftar file yang wajib termuat (dicek oleh js/app.js)
+        var VERSI_WEB = "v10";
+        var FILE_VERSI = {};
+        var FILE_WAJIB = ["config", "util", "api", "auth", "stok", "hitung", "masuk", "keluar", "riwayat", "cetak", "report", "app"];
+        function gagalMuatFile(src) {
+            var d = document.getElementById("banner-error-file");
+            if (!d) { d = document.createElement("div"); d.id = "banner-error-file"; document.body.insertBefore(d, document.body.firstChild); }
+            var nama = String(src).split("?")[0].split("/").slice(-2).join("/");
+            d.textContent = "⚠️ File website gagal dimuat: " + nama + ". Pastikan SEMUA file (index.html, folder css/ dan js/) sudah di-upload ke GitHub, tunggu 1-2 menit, lalu tekan Ctrl+Shift+R.";
+        }
+    </script>
+</head>
+<body>
+
+
+<div id="ribbon-uji" class="ribbon-uji"></div>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+    <div class="login-card">
+        <h2>📦 Sistem Manajemen Stok Cahaya</h2>
+        <p>Silakan masuk dengan User ID dan Password</p>
+        <form onsubmit="prosesLogin(event)">
+            <input type="text" id="login-user" placeholder="User ID" autocomplete="username"
+                   autocapitalize="off" autocorrect="off" spellcheck="false" required>
+            <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+            <button type="submit" class="btn" id="btn-login">🔑 Masuk</button>
+        </form>
+        <div id="login-pesan"></div>
+    </div>
+</div>
+
+<!-- ================= APLIKASI ================= -->
+<div class="container" id="app" style="display:none;">
+    <h2>📦 Sistem Manajemen Stok Cahaya <span class="versi" id="versi-web"></span></h2>
+
+    <div class="userbar">
+        <div>
+            <span class="hello" id="hello-text">Hello</span>
+            <span class="badge" id="hello-level"></span>
+        </div>
+        <button class="btn btn-small btn-gray" onclick="logout()">🚪 Keluar</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn" id="btn-tab-masuk" onclick="bukaTab('tab-masuk')">📥 Barang Masuk</button>
+        <button class="tab-btn" id="btn-tab-keluar" onclick="bukaTab('tab-keluar')">📤 Barang Keluar</button>
+        <button class="tab-btn" id="btn-tab-riwayat" onclick="bukaTab('tab-riwayat')">🧾 Cetak Invoice</button>
+        <button class="tab-btn" id="btn-tab-stok" onclick="bukaTab('tab-stok')">📊 Stok Gudang</button>
+        <button class="tab-btn" id="btn-tab-report" onclick="bukaTab('tab-report')">📈 Report</button>
+        <button class="btn btn-small" style="margin-left:auto;" onclick="refreshSemua()">🔄 Refresh Data</button>
+    </div>
+
+    <div id="status-message"></div>
+
+    <!-- ================= TAB BARANG MASUK ================= -->
+    <div id="tab-masuk" class="tab-panel">
+        <div class="form-card">
+            <h3>📝 Form Input Barang Masuk (Berdasarkan Invoice)</h3>
+            <form id="form-barang-masuk" onsubmit="submitData(event)">
+                <div class="invoice-header">
+                    <div class="form-group">
+                        <label>Nama Toko / Supplier</label>
+                        <input type="text" id="nama_toko" placeholder="Contoh: Toko Berkah" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Invoice</label>
+                        <input type="date" id="tanggal_invoice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Invoice</label>
+                        <input type="text" id="nomor_invoice" placeholder="Contoh: INV/2026/001" required>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="font-weight: bold;">Daftar Item Barang Masuk:</label>
+                    <button type="button" class="btn btn-warning" onclick="tambahBarisItem()">➕ Tambah Baris</button>
+                </div>
+
+                <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
+                    <div class="grid-header">Nama Barang (Dropdown)</div>
+                    <div class="grid-header">Jumlah Masuk</div>
+                    <div class="grid-header">Harga Beli Satuan (Rp)</div>
+                    <div class="grid-header num">Subtotal</div>
+                    <div class="grid-header">Aksi</div>
+                </div>
+
+                <div id="container-item-list"></div>
+
+                <div class="total-bar">
+                    <span>Total Qty: <strong id="masuk-total-qty">0</strong></span>
+                    <span>Total Harga Barang: <strong class="besar" id="masuk-total-harga">Rp 0</strong></span>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" id="btn-simpan" class="btn btn-success">💾 Simpan Semua Barang Masuk</button>
+                </div>
+                <div id="pesan-masuk" class="pesan-form"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= TAB BARANG KELUAR ================= -->
+    <div id="tab-keluar" class="tab-panel">
+        <div class="form-card">
+            <h3>📤 Form Input Barang Keluar</h3>
+            <form id="form-barang-keluar" onsubmit="submitKeluar(event)">
+                <div class="invoice-header">
+                    <div class="form-group">
+                        <label>Tanggal Invoice</label>
+                        <input type="date" id="tanggal_keluar" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Pelanggan / Tujuan</label>
+                        <input type="text" id="nama_pelanggan" placeholder="Contoh: Budi / Umum">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipe Keluar</label>
+                        <select id="tipe_keluar" onchange="terapkanTipe()">
+                            <option value="Penjualan">Penjualan</option>
+                            <option value="Pemakaian Internal">Pemakaian Internal</option>
+                            <option value="Rusak / Hilang">Rusak / Hilang</option>
+                            <option value="Retur ke Supplier">Retur ke Supplier</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Catatan (opsional)</label>
+                        <input type="text" id="catatan_keluar" placeholder="Contoh: bayar cash">
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Alamat / Kota (opsional, tampil di invoice &amp; surat jalan)</label>
+                        <input type="text" id="alamat_pelanggan" placeholder="Contoh: Padang">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="font-weight: bold;">Daftar Item Barang Keluar:</label>
+                    <button type="button" class="btn btn-warning" onclick="tambahBarisKeluar()">➕ Tambah Baris</button>
+                </div>
+
+                <div class="grid-container" style="background: #eef2f7; border: none; padding: 8px 10px;">
+                    <div class="grid-header">Nama Barang (stok tersedia)</div>
+                    <div class="grid-header">Jumlah Keluar</div>
+                    <div class="grid-header">Harga Jual Satuan (Rp)</div>
+                    <div class="grid-header num">Subtotal</div>
+                    <div class="grid-header">Aksi</div>
+                </div>
+
+                <div id="container-keluar-list"></div>
+
+                <div class="total-bar">
+                    <span>Total Qty: <strong id="keluar-total-qty">0</strong></span>
+                    <span>Total Harga Barang: <strong class="besar" id="keluar-total-harga">Rp 0</strong></span>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" id="btn-simpan-keluar" class="btn btn-orange">📤 Simpan Barang Keluar</button>
+                </div>
+                <div id="pesan-keluar" class="pesan-form"></div>
+            </form>
+
+            <div id="hasil-keluar">
+                <span id="hasil-keluar-teks"></span>
+                <button type="button" class="btn btn-small" onclick="bukaDokumen(lastInvoice, 'invoice')">🖨️ Cetak Invoice</button>
+                <button type="button" class="btn btn-small btn-teal" onclick="bukaDokumen(lastInvoice, 'sj')">🚚 Cetak Surat Jalan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TAB CETAK INVOICE ================= -->
+    <div id="tab-riwayat" class="tab-panel">
+        <h3>🧾 Cetak Invoice</h3>
+        <div class="filter-bar">
+            <div class="form-group">
+                <label>Cari (No. Invoice / Pelanggan / Barang)</label>
+                <input type="text" id="cari-riwayat" placeholder="Ketik untuk mencari..." oninput="renderRiwayat()">
+            </div>
+            <div class="form-group">
+                <label>Dari Tanggal</label>
+                <input type="date" id="tgl-dari" onchange="renderRiwayat()">
+            </div>
+            <div class="form-group">
+                <label>Sampai Tanggal</label>
+                <input type="date" id="tgl-sampai" onchange="renderRiwayat()">
+            </div>
+            <button class="btn btn-gray" onclick="resetFilterRiwayat()">Reset</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>No. Invoice</th>
+                    <th>Tanggal</th>
+                    <th>Pelanggan</th>
+                    <th>Tipe</th>
+                    <th class="num">Item</th>
+                    <th class="num">Total</th>
+                    <th>Cetak</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-riwayat-body">
+                <tr><td colspan="7" style="text-align:center;">Buka tab ini untuk memuat data...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= TAB STOK ================= -->
+    <div id="tab-stok" class="tab-panel">
+        <h3>📊 Daftar Master Stok Gudang</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>Kategori</th>
+                    <th class="num">Stok Tersedia</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabel-stok-body">
+                <tr><td colspan="4" style="text-align: center;">Memuat data dari Google Sheets...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= TAB REPORT (admin) ================= -->
+    <div id="tab-report" class="tab-panel">
+        <h3>📈 Report Penjualan &amp; Planning Stok</h3>
+        <div id="report-isi"><div class="report-loading">Buka tab ini untuk memuat data...</div></div>
+    </div>
+
+    <div id="debug-wrap">
+        <h3>🛠️ Debug (balasan asli dari server)</h3>
+        <div id="debug-box">belum ada aktivitas...</div>
+    </div>
+</div>
+
+<!-- ================= MODAL DOKUMEN ================= -->
+<div class="modal-overlay" id="modal-invoice">
+    <div class="modal-box">
+        <div class="modal-actions no-print">
+            <button class="btn" onclick="window.print()">🖨️ Cetak</button>
+            <button class="btn btn-gray" onclick="tutupInvoice()">✖ Tutup</button>
+        </div>
+        <div id="invoice-isi"></div>
+    </div>
+</div>
+
+<script src="js/config.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/util.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/api.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/auth.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/stok.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/hitung.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/masuk.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/keluar.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/riwayat.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/cetak.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/report.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/app.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+
+</body>
+</html>
