@@ -1,5 +1,5 @@
 // js/report.js - Tab Report + cetak report
-FILE_VERSI["report"] = "v10";
+FILE_VERSI["report"] = "v11";
 
 // ---------- report (admin) ----------
 let reportData = null;

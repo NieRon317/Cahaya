@@ -1,5 +1,5 @@
 // js/api.js - Komunikasi dengan server Google Apps Script (kirim, anti-dobel, pesan koneksi)
-FILE_VERSI["api"] = "v10";
+FILE_VERSI["api"] = "v11";
 
 // ---------- kirim ke server ----------
 async function kirimPost(payload) {

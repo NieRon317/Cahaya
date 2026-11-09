@@ -1,5 +1,5 @@
 // js/cetak.js - Dokumen cetak: invoice, surat jalan, terbilang
-FILE_VERSI["cetak"] = "v10";
+FILE_VERSI["cetak"] = "v11";
 
 // ---------- terbilang (angka -> kata) ----------
 function terbilangAngka(n) {

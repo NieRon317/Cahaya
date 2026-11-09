@@ -1,5 +1,5 @@
 // js/masuk.js - Form Barang Masuk
-FILE_VERSI["masuk"] = "v10";
+FILE_VERSI["masuk"] = "v11";
 
 // ---------- barang masuk ----------
 function tambahBarisItem() {

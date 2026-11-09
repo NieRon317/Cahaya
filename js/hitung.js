@@ -1,5 +1,5 @@
 // js/hitung.js - Perhitungan subtotal & total di form barang masuk/keluar
-FILE_VERSI["hitung"] = "v10";
+FILE_VERSI["hitung"] = "v11";
 
 // ---------- hitung total harga ----------
 function hitungTotal(cfg) {

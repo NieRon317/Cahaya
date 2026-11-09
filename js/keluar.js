@@ -1,5 +1,5 @@
 // js/keluar.js - Form Barang Keluar
-FILE_VERSI["keluar"] = "v10";
+FILE_VERSI["keluar"] = "v11";
 
 // ---------- barang keluar ----------
 function tambahBarisKeluar() {

@@ -1,5 +1,5 @@
 // js/riwayat.js - Tab Cetak Invoice (daftar invoice keluar)
-FILE_VERSI["riwayat"] = "v10";
+FILE_VERSI["riwayat"] = "v11";
 
 // ---------- cetak invoice (daftar) ----------
 async function loadRiwayat() {
