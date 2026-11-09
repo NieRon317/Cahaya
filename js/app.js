@@ -1,24 +1,66 @@
 // js/app.js - Perpindahan tab + proses start halaman
-FILE_VERSI["app"] = "v10";
+FILE_VERSI["app"] = "v11";
 
 // ---------- tab ----------
 function tabBoleh(id) {
-    let izin = sesi ? (TAB_LEVEL[sesi.level] || ["tab-stok"]) : [];
-    return izin.indexOf(id) >= 0;
+    return !!sesi && (sesi.menu || []).map(k => MENU_TAB[k]).indexOf(id) >= 0;
 }
 function bukaTab(id) {
     if (!tabBoleh(id)) return;
+    // pindah dari tab Admin -> akses Admin dikunci kembali
+    let sedangAktif = document.querySelector(".tab-panel.active");
+    if (sedangAktif && sedangAktif.id === "tab-admin" && id !== "tab-admin") adminKunci();
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
     document.getElementById(id).classList.add("active");
     document.getElementById("btn-" + id).classList.add("active");
     if (id === "tab-riwayat") loadRiwayat();
     if (id === "tab-report") loadReport(false);
+    if (id === "tab-admin") adminTampil();
 }
 function refreshSemua() {
-    loadData();
+    if (punyaMenu("stok_gudang") || punyaMenu("barang_masuk") || punyaMenu("barang_keluar")) loadData();
     if (document.getElementById("tab-riwayat").classList.contains("active")) loadRiwayat();
     if (document.getElementById("tab-report").classList.contains("active")) loadReport(false);
+}
+
+// ---------- keluar otomatis bila tidak ada aktivitas ----------
+let terakhirAktif = Date.now();
+let terakhirPing = Date.now();
+let timerAktivitas = null;
+let pendengarAktivitas = false;
+
+function catatAktivitas() { terakhirAktif = Date.now(); }
+
+function mulaiPemantauAktivitas() {
+    terakhirAktif = Date.now();
+    terakhirPing = Date.now();
+    if (!pendengarAktivitas) {
+        ["mousemove", "keydown", "click", "touchstart", "scroll"].forEach(e => window.addEventListener(e, catatAktivitas, { passive: true }));
+        pendengarAktivitas = true;
+    }
+    clearInterval(timerAktivitas);
+    timerAktivitas = setInterval(periksaAktivitas, CEK_AKTIVITAS_DETIK * 1000);
+}
+
+function hentikanPemantauAktivitas() {
+    clearInterval(timerAktivitas);
+    timerAktivitas = null;
+}
+
+async function periksaAktivitas() {
+    if (!sesi) return;
+    let diamMenit = (Date.now() - terakhirAktif) / 60000;
+    if (diamMenit >= INAKTIF_MENIT) {
+        logout("Anda keluar otomatis karena tidak ada aktivitas selama " + INAKTIF_MENIT + " menit.");
+        return;
+    }
+    // masih aktif: sesekali beri tahu server supaya sesi tetap hidup walau sedang mengetik lama
+    let jedaPing = Math.max(INAKTIF_MENIT / 3, 0.02);
+    if ((Date.now() - terakhirPing) / 60000 >= jedaPing) {
+        terakhirPing = Date.now();
+        try { await kirimPost({ aksi: "sesi" }); } catch (e) { /* koneksi sesaat putus: abaikan */ }
+    }
 }
 
 // ---------- start ----------
@@ -38,8 +80,8 @@ window.onload = async function () {
         pesanLogin("⏳ Memeriksa sesi...", false);
         try {
             let res = await kirimPost({ aksi: "sesi", token: tersimpan });
-            if (res.status === "success" && res.user && res.user.level) {
-                masukAplikasi(Object.assign({}, res.user, { token: tersimpan, lingkungan: res.lingkungan }));
+            if (res.status === "success" && res.user && Array.isArray(res.user.menu)) {
+                masukAplikasi(Object.assign({}, res.user, { token: tersimpan, lingkungan: res.lingkungan, sesi_menit: res.sesi_menit }));
                 return;
             }
             hapusSesi();

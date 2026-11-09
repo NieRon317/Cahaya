@@ -1,5 +1,5 @@
 // js/stok.js - Tab Stok Gudang + dropdown barang
-FILE_VERSI["stok"] = "v10";
+FILE_VERSI["stok"] = "v11";
 
 // ---------- load data stok ----------
 async function loadData() {
@@ -14,10 +14,8 @@ async function loadData() {
             globalListBarang = result.listBarang || [];
             segarkanDropdown();
 
-            if (sesi.level === "admin") {
-                if (document.getElementById("container-item-list").children.length === 0) tambahBarisItem();
-                if (document.getElementById("container-keluar-list").children.length === 0) tambahBarisKeluar();
-            }
+            if (punyaMenu("barang_masuk") && document.getElementById("container-item-list").children.length === 0) tambahBarisItem();
+            if (punyaMenu("barang_keluar") && document.getElementById("container-keluar-list").children.length === 0) tambahBarisKeluar();
 
             tbodyStok.innerHTML = "";
             if (!result.dataStok || result.dataStok.length === 0) {

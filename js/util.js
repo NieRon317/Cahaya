@@ -1,5 +1,5 @@
 // js/util.js - Fungsi bantu umum: format rupiah/tanggal, escape HTML, pesan, sesi browser
-FILE_VERSI["util"] = "v10";
+FILE_VERSI["util"] = "v11";
 
 // ---------- util ----------
 function esc(s) {
@@ -74,4 +74,12 @@ function pesanForm(form, teks, jenis, durasi = 4000) {
 function hapusPesanForm(form) {
     let el = document.getElementById("pesan-" + form);
     if (el) el.style.display = "none";
+}
+
+// dialog (jendela kecil) untuk Admin & Ganti Password. Pesan dialog tampil DI BAWAH tombol simpan.
+function bukaDlg(nama) { let e = document.getElementById("dlg-" + nama); if (e) e.style.display = "flex"; }
+function tutupDlg(nama) {
+    let e = document.getElementById("dlg-" + nama);
+    if (e) e.style.display = "none";
+    hapusPesanForm("dlg-" + nama);
 }
