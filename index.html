@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Manajemen Stok Cahaya</title>
-    <link rel="stylesheet" href="css/style.css?v=10">
+    <link rel="stylesheet" href="css/style.css?v=11">
     <script>
         // Versi paket website ini + daftar file yang wajib termuat (dicek oleh js/app.js)
-        var VERSI_WEB = "v10";
+        var VERSI_WEB = "v11";
         var FILE_VERSI = {};
-        var FILE_WAJIB = ["config", "util", "api", "auth", "stok", "hitung", "masuk", "keluar", "riwayat", "cetak", "report", "app"];
+        var FILE_WAJIB = ["config", "util", "api", "auth", "stok", "hitung", "masuk", "keluar", "riwayat", "cetak", "report", "admin", "password", "app"];
         function gagalMuatFile(src) {
             var d = document.getElementById("banner-error-file");
             if (!d) { d = document.createElement("div"); d.id = "banner-error-file"; document.body.insertBefore(d, document.body.firstChild); }
@@ -47,7 +47,10 @@
             <span class="hello" id="hello-text">Hello</span>
             <span class="badge" id="hello-level"></span>
         </div>
-        <button class="btn btn-small btn-gray" onclick="logout()">🚪 Keluar</button>
+        <div style="display:flex;gap:8px;">
+            <button class="btn btn-small" onclick="bukaGantiPassword()">🔑 Ganti Password</button>
+            <button class="btn btn-small btn-gray" onclick="logout()">🚪 Keluar</button>
+        </div>
     </div>
 
     <div class="tabs">
@@ -56,10 +59,15 @@
         <button class="tab-btn" id="btn-tab-riwayat" onclick="bukaTab('tab-riwayat')">🧾 Cetak Invoice</button>
         <button class="tab-btn" id="btn-tab-stok" onclick="bukaTab('tab-stok')">📊 Stok Gudang</button>
         <button class="tab-btn" id="btn-tab-report" onclick="bukaTab('tab-report')">📈 Report</button>
+        <button class="tab-btn" id="btn-tab-admin" onclick="bukaTab('tab-admin')">⚙️ Admin</button>
         <button class="btn btn-small" style="margin-left:auto;" onclick="refreshSemua()">🔄 Refresh Data</button>
     </div>
 
     <div id="status-message"></div>
+
+    <div id="tanpa-menu" class="alert-info panel-info" style="display:none;">
+        Akun Anda belum diberi menu apa pun. Hubungi admin untuk meminta akses.
+    </div>
 
     <!-- ================= TAB BARANG MASUK ================= -->
     <div id="tab-masuk" class="tab-panel">
@@ -236,9 +244,109 @@
         <div id="report-isi"><div class="report-loading">Buka tab ini untuk memuat data...</div></div>
     </div>
 
+    <!-- ================= TAB ADMIN ================= -->
+    <div id="tab-admin" class="tab-panel">
+        <h3>⚙️ Admin</h3>
+
+        <div id="admin-login" class="admin-login">
+            <p>Untuk keamanan, masukkan <strong>password Anda</strong> sekali lagi untuk membuka menu Admin.
+               Akses ini otomatis terkunci saat Anda pindah menu atau tidak ada aktivitas.</p>
+            <form onsubmit="adminMasuk(event)">
+                <input type="password" id="admin-pass" placeholder="Password Anda" autocomplete="current-password" required>
+                <div style="margin-top:12px;"><button type="submit" id="btn-admin-masuk" class="btn">🔓 Masuk Menu Admin</button></div>
+            </form>
+            <div id="pesan-admin-login" class="pesan-form"></div>
+        </div>
+
+        <div id="admin-isi" style="display:none;">
+            <div class="rep-bar">
+                <span>🔓 Akses Admin aktif. Terkunci otomatis bila pindah menu atau tidak ada aktivitas.</span>
+                <button class="btn btn-small btn-gray" onclick="adminKunci(); adminTampil();">🔒 Kunci sekarang</button>
+            </div>
+
+            <div id="admin-bagian-user">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <h3 style="flex:1;">👥 Kelola User</h3>
+                    <button class="btn btn-small btn-success" onclick="adminTambah()">➕ Tambah User</button>
+                </div>
+                <div id="pesan-admin" class="pesan-form"></div>
+                <table>
+                    <thead>
+                        <tr><th>User</th><th>Nama</th><th>Jabatan</th><th>Status</th><th>Menu &amp; izin</th><th>Password</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="admin-user-body"></tbody>
+                </table>
+            </div>
+            <div id="admin-tanpa-fitur" class="alert-info panel-info" style="display:none;">
+                Belum ada fitur Admin yang bisa Anda akses saat ini.
+            </div>
+            <p class="catatan-kecil">Pembatalan invoice dan barang masuk akan tersedia di menu ini pada tahap berikutnya.</p>
+        </div>
+    </div>
+
     <div id="debug-wrap">
         <h3>🛠️ Debug (balasan asli dari server)</h3>
         <div id="debug-box">belum ada aktivitas...</div>
+    </div>
+</div>
+
+
+<!-- ================= DIALOG: TAMBAH / UBAH USER ================= -->
+<div class="dlg-overlay" id="dlg-user">
+    <div class="dlg-box">
+        <h3 id="dlg-user-judul">Tambah User</h3>
+        <form onsubmit="adminSimpan(event)">
+            <div class="form-group"><label>User ID (huruf, angka, titik, garis bawah, strip; 3-30 karakter)</label>
+                <input type="text" id="du-user" autocomplete="off" autocapitalize="off" spellcheck="false" required></div>
+            <div class="form-group"><label>Nama</label><input type="text" id="du-nama" autocomplete="off" required></div>
+            <div class="form-group"><label>Jabatan (hanya label, tidak mengatur akses)</label><input type="text" id="du-jabatan" autocomplete="off"></div>
+            <div class="form-group" id="du-pw-grup"><label>Password awal (minimal 8 karakter)</label>
+                <div style="display:flex;gap:8px;"><input type="text" id="du-pass" autocomplete="off" spellcheck="false">
+                <button type="button" class="btn btn-small btn-gray" onclick="adminAcak('du-pass')">🎲 Acak</button></div>
+                <div class="catatan-kecil">Catat dan sampaikan ke yang bersangkutan. Setelah disimpan, password tidak bisa dilihat lagi.</div></div>
+            <div class="form-group"><label>Menu yang boleh dibuka</label><div id="du-menu" class="cek-grid"></div></div>
+            <div class="form-group"><label>Izin khusus</label><div id="du-izin" class="cek-grid"></div></div>
+            <div class="dlg-aksi">
+                <button type="submit" id="btn-du-simpan" class="btn btn-success">💾 Simpan</button>
+                <button type="button" class="btn btn-gray" onclick="tutupDlg('user')">Batal</button>
+            </div>
+            <div id="pesan-dlg-user" class="pesan-form"></div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= DIALOG: RESET PASSWORD ================= -->
+<div class="dlg-overlay" id="dlg-reset">
+    <div class="dlg-box">
+        <h3>🔑 Reset Password</h3>
+        <p>User: <strong id="dr-user"></strong></p>
+        <form onsubmit="adminSimpanReset(event)">
+            <div class="form-group"><label>Password baru (minimal 8 karakter)</label>
+                <div style="display:flex;gap:8px;"><input type="text" id="dr-pass" autocomplete="off" spellcheck="false" required>
+                <button type="button" class="btn btn-small btn-gray" onclick="adminAcak('dr-pass')">🎲 Acak</button></div></div>
+            <div class="dlg-aksi">
+                <button type="submit" id="btn-dr-simpan" class="btn btn-success">💾 Simpan Password Baru</button>
+                <button type="button" class="btn btn-gray" onclick="tutupDlg('reset')">Batal</button>
+            </div>
+            <div id="pesan-dlg-reset" class="pesan-form"></div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= DIALOG: GANTI PASSWORD SENDIRI ================= -->
+<div class="dlg-overlay" id="dlg-password">
+    <div class="dlg-box">
+        <h3>🔑 Ganti Password</h3>
+        <form onsubmit="simpanGantiPassword(event)">
+            <div class="form-group"><label>Password lama</label><input type="password" id="gp-lama" autocomplete="current-password" required></div>
+            <div class="form-group"><label>Password baru (minimal 8 karakter)</label><input type="password" id="gp-baru" autocomplete="new-password" required></div>
+            <div class="form-group"><label>Ulangi password baru</label><input type="password" id="gp-konf" autocomplete="new-password" required></div>
+            <div class="dlg-aksi">
+                <button type="submit" id="btn-gp-simpan" class="btn btn-success">💾 Simpan Password Baru</button>
+                <button type="button" class="btn btn-gray" onclick="tutupDlg('password')">Batal</button>
+            </div>
+            <div id="pesan-dlg-password" class="pesan-form"></div>
+        </form>
     </div>
 </div>
 
@@ -253,18 +361,20 @@
     </div>
 </div>
 
-<script src="js/config.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/util.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/api.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/auth.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/stok.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/hitung.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/masuk.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/keluar.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/riwayat.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/cetak.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/report.js?v=10" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/app.js?v=10" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/config.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/util.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/api.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/auth.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/stok.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/hitung.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/masuk.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/keluar.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/riwayat.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/cetak.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/report.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/admin.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/password.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/app.js?v=11" onerror="gagalMuatFile(this.src)"></script>
 
 </body>
 </html>
