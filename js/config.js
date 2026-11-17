@@ -1,34 +1,34 @@
-// js/config.js - Konfigurasi & keadaan aplikasi (alamat server, nama toko, hak tab, data yang dipegang halaman)
-FILE_VERSI["config"] = "v11";
+// =====================================================================
+//  CONFIG.gs  -  semua pengaturan teknis di SATU tempat
+//
+//  Untuk membuat LINGKUNGAN UJI (salinan), cukup ubah dua baris ini di salinan:
+//     SS_URL     -> alamat spreadsheet salinan
+//     LINGKUNGAN -> "UJI"   (website akan menampilkan pita peringatan)
+//  Nilai di sheet "Pengaturan" (kalau ada) menimpa nilai bawaan bertanda [P].
+// =====================================================================
+var SS_URL = "https://docs.google.com/spreadsheets/d/1cfav5csuDHrKNAz9y3GbLJIkzTuITSmFjamRMYyr6fc/edit";
+var LINGKUNGAN = "PRODUKSI";    // "PRODUKSI" atau "UJI"
+var BUILD = "12.0";              // nomor build kode server (hanya informasi)
+var VERSI = "v11";               // protokol server; dicek oleh website
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxctN-seNGKAk-6d5vxygaEpbFOE2jCNOmsKUfGjsgm-07Dv9H2gGC_oZSruhR0hVgAQ/exec";
-const VERSI_SERVER = "v11";    // versi script Google yang dibutuhkan website ini
-const JUDUL_ASLI = document.title;
-const NAMA_TOKO = "CAHAYA";   // tampil di kop invoice / surat jalan
+var TZ = "Asia/Jakarta";
+var TZ_OFFSET_MS = 7 * 3600 * 1000;   // WIB = UTC+7 (tanpa jam musim panas)
 
-// menu dari server (kunci) -> id tab. SERVER yang menentukan menu mana yang boleh dibuka
-// dan mengecek ulang di setiap permintaan; ini hanya pemetaan untuk tampilan.
-const MENU_TAB = {
-    barang_masuk: "tab-masuk",
-    barang_keluar: "tab-keluar",
-    cetak_invoice: "tab-riwayat",
-    stok_gudang: "tab-stok",
-    report: "tab-report",
-    admin: "tab-admin"
-};
-const SEMUA_TAB = ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok", "tab-report", "tab-admin"];
-const PASSWORD_MIN_WEB = 8;       // server tetap mengecek ulang
+// ---- nilai bawaan [P] = bisa ditimpa lewat sheet Pengaturan ----
+var MINIMUM_DEFAULT = 5;         // [P] Minimum_Stok_Bawaan
+var BATAS_DUPLIKAT_MENIT = 10;   // [P] Batas_Duplikat_Menit
+var NOMOR_DIGIT = 3;             // [P] Nomor_Digit
+var PREFIX_INVOICE = "IV.CHY";   // nomor invoice: IV.CHY/2026.10.14/001
 
-// keluar otomatis bila tidak ada aktivitas (nilai Sesi_Menit dikirim server saat login)
-let INAKTIF_MENIT = 30;
-let CEK_AKTIVITAS_DETIK = 15;
+// ---- keamanan & sesi ----
+var CACHE_DETIK = 21600;         // ingatan request_id: 6 jam
+var SESI_MENIT_BAWAAN = 30;      // [P] Sesi_Menit: keluar otomatis bila tidak ada aktivitas
+var ADMIN_MENIT_BAWAAN = 10;     // [P] Admin_Menit: lama izin menu Admin setelah masuk ulang
+var MAX_GAGAL = 5;               // salah password X kali -> user dikunci sementara
+var KUNCI_DETIK = 900;           // lama kunci: 15 menit
+var HASH_PUTARAN = 300;          // jumlah putaran hash password baru (ukur dengan ujiKecepatanHash())
+var PASSWORD_MIN = 8;            // panjang minimal password baru
 
-let sesi = null;   // { user, nama, jabatan, menu:[...], izin:[...], token }
-let globalListBarang = [];
-let globalRiwayat = [];
-let lastInvoice = null;
-let statusTimer = null;
-
-// penanda kiriman (anti transaksi dobel)
-let pendingMasuk = { sig: "", id: "" };
-let pendingKeluar = { sig: "", id: "" };
+// ---- report ----
+var JUMLAH_BULAN = 13;           // 12 bulan ke belakang + bulan berjalan
+var CACHE_REPORT_DETIK = 600;    // hasil report disimpan 10 menit
