@@ -1,10 +1,11 @@
-// js/admin.js - Tab Admin: masuk ulang dengan password, kelola user
+// js/admin.js - Tab Admin: masuk ulang dengan password, kelola user dan barang
 FILE_VERSI["admin"] = "v11";
 
 let adminTerbuka = false;      // sudah masuk ulang ke menu Admin?
 let adminData = null;          // { users, menu_def, izin_def }
 let adminMode = "baru";        // "baru" | "ubah" (dialog user)
 let adminTargetReset = "";
+let adminBarangPending = { sig: "", id: "" };
 
 function byId(id) { return document.getElementById(id); }
 
@@ -18,10 +19,13 @@ function adminTampil() {
         return;
     }
     login.style.display = "none"; isi.style.display = "block";
-    let boleh = punyaIzin("kelola_user");
-    byId("admin-bagian-user").style.display = boleh ? "block" : "none";
-    byId("admin-tanpa-fitur").style.display = boleh ? "none" : "block";
-    if (boleh) adminMuatUser();
+    let bolehUser = punyaIzin("kelola_user");
+    let bolehBarang = punyaIzin("kelola_barang");
+    byId("admin-bagian-user").style.display = bolehUser ? "block" : "none";
+    byId("admin-bagian-barang").style.display = bolehBarang ? "block" : "none";
+    byId("admin-tanpa-fitur").style.display = (bolehUser || bolehBarang) ? "none" : "block";
+    if (bolehUser) adminMuatUser();
+    if (bolehBarang) adminMuatBarang();
 }
 
 async function adminMasuk(event) {
@@ -53,7 +57,74 @@ function adminReset() {
     adminTerbuka = false;
     adminData = null;
     let tb = byId("admin-user-body"); if (tb) tb.innerHTML = "";
-    tutupDlg("user"); tutupDlg("reset");
+    let bb = byId("admin-barang-body"); if (bb) bb.innerHTML = "";
+    tutupDlg("user"); tutupDlg("reset"); tutupDlg("barang");
+}
+
+// ---------- kelola barang (hanya tambah, tanpa mengubah stok lama) ----------
+async function adminMuatBarang() {
+    let tbody = byId("admin-barang-body");
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat...</td></tr>';
+    try {
+        let res = await kirimPost({ aksi: "admin_barang_daftar" });
+        if (!sesi || !adminTerbuka) return;
+        if (adminCekKedaluwarsa(res)) return;
+        if (res.status !== "success") {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;">' + esc(res.message) + '</td></tr>';
+            return;
+        }
+        let barang = res.barang || [];
+        tbody.innerHTML = barang.length ? barang.map(b => '<tr class="' + (b.aktif ? '' : 'baris-nonaktif') + '">' +
+            '<td><strong>' + esc(b.sku) + '</strong></td><td>' + esc(b.nama) + '</td><td>' + esc(b.kategori) +
+            '</td><td>' + esc(b.satuan || 'Pcs') + '</td><td>' + esc(b.minimum === '' ? 'Bawaan' : b.minimum) +
+            '</td><td>' + (b.aktif ? '🟢 Aktif' : '⚪ Nonaktif') + '</td></tr>').join('') :
+            '<tr><td colspan="6" style="text-align:center;">Belum ada barang.</td></tr>';
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;">Gagal terhubung ke server.</td></tr>';
+    }
+}
+
+function adminBukaBarang() {
+    byId("db-nama").value = "";
+    byId("db-kategori").value = "Minuman";
+    byId("db-satuan").value = "Pcs";
+    byId("db-minimum").value = "5";
+    hapusPesanForm("dlg-barang");
+    bukaDlg("barang");
+    byId("db-nama").focus();
+}
+
+async function adminSimpanBarang(event) {
+    event.preventDefault();
+    let payload = {
+        aksi: "admin_barang_tambah", nama: byId("db-nama").value.trim(),
+        kategori: byId("db-kategori").value.trim(), satuan: byId("db-satuan").value.trim(),
+        minimum: byId("db-minimum").value.trim()
+    };
+    let sig = JSON.stringify(payload);
+    if (adminBarangPending.sig !== sig) adminBarangPending = { sig: sig, id: buatId() };
+    payload.request_id = adminBarangPending.id;
+    let btn = byId("btn-db-simpan");
+    btn.disabled = true; btn.textContent = "⏳ Menyimpan...";
+    pesanForm("dlg-barang", "Menyimpan...", "info", 0);
+    try {
+        let res = await kirimPost(payload);
+        if (!sesi) return;
+        if (adminCekKedaluwarsa(res)) return;
+        if (res.status === "success") {
+            adminBarangPending = { sig: "", id: "" };
+            tutupDlg("barang");
+            pesanForm("admin-barang", "✅ " + res.message, "success", 10000);
+            adminMuatBarang();
+            if (punyaMenu("barang_masuk") || punyaMenu("barang_keluar") || punyaMenu("stok_gudang")) loadData();
+        } else {
+            pesanForm("dlg-barang", "❌ " + res.message, "error", 0);
+        }
+    } catch (e) {
+        pesanForm("dlg-barang", pesanKoneksi(e), "error", 0);
+    } finally {
+        btn.disabled = false; btn.textContent = "💾 Simpan Barang";
+    }
 }
 
 // izin Admin sudah habis di server -> kembali ke layar masuk ulang
@@ -158,7 +229,10 @@ async function adminSimpan(event) {
         if (adminCekKedaluwarsa(res)) return;
         if (res.status === "success") {
             tutupDlg("user");
-            pesanForm("admin", "✅ " + res.message, "success", 8000);
+            let perluLoginUlang = payload.user.toLowerCase() === sesi.user.toLowerCase() &&
+                payload.akses.kelola_barang && !punyaIzin("kelola_barang");
+            pesanForm("admin", "✅ " + res.message +
+                (perluLoginUlang ? " Keluar lalu masuk lagi agar menu Kelola Barang tampil." : ""), "success", 10000);
             adminMuatUser();
         } else {
             pesanForm("dlg-user", "❌ " + res.message, "error", 0);
