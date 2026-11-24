@@ -78,6 +78,8 @@ function masukAplikasi(user) {
     if (user.sesi_menit) INAKTIF_MENIT = user.sesi_menit;
     tampilkanRibbon(user.lingkungan);
     setTanggalKeluar();
+    document.getElementById("syarat_bayar").value = "";
+    terapkanBayar();
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app").style.display = "block";
 
@@ -124,6 +126,10 @@ function logout(pesan, tanpaServer) {
     document.getElementById("tabel-riwayat-body").innerHTML = "";
     document.getElementById("report-isi").innerHTML = "";
     reportData = null;
+    reportBulananData = null;
+    piutangData = null;
+    document.getElementById("bulanan-isi").innerHTML = "";
+    document.getElementById("piutang-isi").innerHTML = "";
     document.getElementById("hasil-keluar").style.display = "none";
     document.getElementById("status-message").style.display = "none";
 
