@@ -9,7 +9,7 @@
         // Versi paket website ini + daftar file yang wajib termuat (dicek oleh js/app.js)
         var VERSI_WEB = "v11";
         var FILE_VERSI = {};
-        var FILE_WAJIB = ["config", "util", "api", "auth", "stok", "hitung", "masuk", "keluar", "riwayat", "cetak", "report", "admin", "password", "app"];
+        var FILE_WAJIB = ["config", "util", "api", "auth", "stok", "hitung", "masuk", "keluar", "riwayat", "cetak", "report", "piutang", "admin", "password", "app"];
         function gagalMuatFile(src) {
             var d = document.getElementById("banner-error-file");
             if (!d) { d = document.createElement("div"); d.id = "banner-error-file"; document.body.insertBefore(d, document.body.firstChild); }
@@ -59,6 +59,7 @@
         <button class="tab-btn" id="btn-tab-riwayat" onclick="bukaTab('tab-riwayat')">🧾 Cetak Invoice</button>
         <button class="tab-btn" id="btn-tab-stok" onclick="bukaTab('tab-stok')">📊 Stok Gudang</button>
         <button class="tab-btn" id="btn-tab-report" onclick="bukaTab('tab-report')">📈 Report</button>
+        <button class="tab-btn" id="btn-tab-piutang" onclick="bukaTab('tab-piutang')">💳 Piutang</button>
         <button class="tab-btn" id="btn-tab-admin" onclick="bukaTab('tab-admin')">⚙️ Admin</button>
         <button class="btn btn-small" style="margin-left:auto;" onclick="refreshSemua()">🔄 Refresh Data</button>
     </div>
@@ -125,7 +126,7 @@
                 <div class="invoice-header">
                     <div class="form-group">
                         <label>Tanggal Invoice</label>
-                        <input type="date" id="tanggal_keluar" required>
+                        <input type="date" id="tanggal_keluar" onchange="aturJatuhTempo()" required>
                     </div>
                     <div class="form-group">
                         <label>Nama Pelanggan / Tujuan</label>
@@ -143,6 +144,16 @@
                     <div class="form-group">
                         <label>Catatan (opsional)</label>
                         <input type="text" id="catatan_keluar" placeholder="Contoh: bayar cash">
+                    </div>
+                    <div class="form-group" id="keluar-bayar-wrap">
+                        <label>Pembayaran penjualan</label>
+                        <select id="syarat_bayar" onchange="terapkanBayar()" required>
+                            <option value="">Pilih pembayaran...</option><option value="Lunas">Lunas</option><option value="Tempo">Jatuh tempo</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="keluar-jatuh-wrap" style="display:none;">
+                        <label>Tanggal jatuh tempo</label>
+                        <input type="date" id="tanggal_jatuh_tempo">
                     </div>
                     <div class="form-group" style="grid-column: span 2;">
                         <label>Alamat / Kota (opsional, tampil di invoice &amp; surat jalan)</label>
@@ -242,6 +253,19 @@
     <div id="tab-report" class="tab-panel">
         <h3>📈 Report Penjualan &amp; Planning Stok</h3>
         <div id="report-isi"><div class="report-loading">Buka tab ini untuk memuat data...</div></div>
+        <h3>Laporan Bulanan</h3>
+        <div class="rep-controls">
+            <label>Bulan <select id="bulanan-bulan"></select></label>
+            <label>Tahun <input type="number" id="bulanan-tahun" min="2000" max="2100" style="width:110px;"></label>
+            <button class="btn btn-small" onclick="loadReportBulanan()">Tampilkan</button>
+            <button class="btn btn-small btn-gray" id="btn-cetak-bulanan" onclick="cetakReportBulanan()" disabled>Cetak / Simpan PDF</button>
+        </div>
+        <div id="bulanan-isi"></div>
+    </div>
+
+    <div id="tab-piutang" class="tab-panel">
+        <h3>💳 Piutang</h3>
+        <div id="piutang-isi">Buka tab ini untuk memuat piutang...</div>
     </div>
 
     <!-- ================= TAB ADMIN ================= -->
@@ -392,20 +416,21 @@
     </div>
 </div>
 
-<script src="js/config.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/config.js?v=12" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/util.js?v=11" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/api.js?v=11" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/auth.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/auth.js?v=12" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/stok.js?v=11" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/hitung.js?v=11" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/masuk.js?v=11" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/keluar.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/keluar.js?v=12" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/riwayat.js?v=11" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/cetak.js?v=11" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/report.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/cetak.js?v=12" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/report.js?v=12" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/piutang.js?v=12" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/admin.js?v=12" onerror="gagalMuatFile(this.src)"></script>
 <script src="js/password.js?v=11" onerror="gagalMuatFile(this.src)"></script>
-<script src="js/app.js?v=11" onerror="gagalMuatFile(this.src)"></script>
+<script src="js/app.js?v=12" onerror="gagalMuatFile(this.src)"></script>
 
 </body>
 </html>
