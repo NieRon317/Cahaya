@@ -30,6 +30,29 @@ function terapkanTipe() {
         if (!isJual) inp.value = "0";
     });
     hitungKeluar();
+    terapkanBayar();
+}
+
+let jatuhTempoOtomatis = "";
+function aturJatuhTempo() {
+    let tanggal = document.getElementById("tanggal_keluar").value;
+    let input = document.getElementById("tanggal_jatuh_tempo");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) return;
+    let d = new Date(tanggal + "T12:00:00Z");
+    d.setUTCDate(d.getUTCDate() + 7);
+    let baru = d.toISOString().slice(0, 10);
+    if (!input.value || input.value === jatuhTempoOtomatis) input.value = baru;
+    input.min = tanggal;
+    jatuhTempoOtomatis = baru;
+}
+function terapkanBayar() {
+    let jual = document.getElementById("tipe_keluar").value === "Penjualan";
+    let tempo = jual && document.getElementById("syarat_bayar").value === "Tempo";
+    document.getElementById("keluar-bayar-wrap").style.display = jual ? "" : "none";
+    document.getElementById("keluar-jatuh-wrap").style.display = tempo ? "" : "none";
+    document.getElementById("syarat_bayar").required = jual;
+    document.getElementById("tanggal_jatuh_tempo").required = tempo;
+    if (tempo) aturJatuhTempo();
 }
 
 async function submitKeluar(event) {
@@ -74,6 +97,8 @@ async function submitKeluar(event) {
         tanggal: document.getElementById("tanggal_keluar").value,
         alamat: document.getElementById("alamat_pelanggan").value,
         tipe_keluar: tipe,
+        syarat_bayar: tipe === "Penjualan" ? document.getElementById("syarat_bayar").value : "",
+        tanggal_jatuh_tempo: tipe === "Penjualan" && document.getElementById("syarat_bayar").value === "Tempo" ? document.getElementById("tanggal_jatuh_tempo").value : "",
         catatan: document.getElementById("catatan_keluar").value,
         items: items
     };
@@ -94,6 +119,10 @@ async function submitKeluar(event) {
             pendingKeluar = { sig: "", id: "" };
             document.getElementById("form-barang-keluar").reset();
             setTanggalKeluar();
+            document.getElementById("syarat_bayar").value = "";
+            document.getElementById("tanggal_jatuh_tempo").value = "";
+            jatuhTempoOtomatis = "";
+            terapkanBayar();
             document.getElementById("container-keluar-list").innerHTML = "";
             tambahBarisKeluar();
             loadData();
