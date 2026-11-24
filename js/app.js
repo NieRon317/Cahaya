@@ -15,13 +15,15 @@ function bukaTab(id) {
     document.getElementById(id).classList.add("active");
     document.getElementById("btn-" + id).classList.add("active");
     if (id === "tab-riwayat") loadRiwayat();
-    if (id === "tab-report") loadReport(false);
+    if (id === "tab-report") { siapkanPilihanBulanan(); loadReport(false); }
+    if (id === "tab-piutang") loadPiutang();
     if (id === "tab-admin") adminTampil();
 }
 function refreshSemua() {
     if (punyaMenu("stok_gudang") || punyaMenu("barang_masuk") || punyaMenu("barang_keluar")) loadData();
     if (document.getElementById("tab-riwayat").classList.contains("active")) loadRiwayat();
     if (document.getElementById("tab-report").classList.contains("active")) loadReport(false);
+    if (document.getElementById("tab-piutang").classList.contains("active")) loadPiutang();
 }
 
 // ---------- keluar otomatis bila tidak ada aktivitas ----------
