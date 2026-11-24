@@ -73,7 +73,7 @@ function htmlInvoice(inv, isJual) {
                         <td>Nomor:<br><b>${esc(inv.no_invoice)}</b></td>
                     </tr>
                     <tr>
-                        <td>Tanggal Jatuh Tempo:<br>&nbsp;</td>
+                        <td>Tanggal Jatuh Tempo:<br><b>${esc(inv.jatuh_tempo || (inv.syarat_bayar === "Tempo" ? "" : "—"))}</b></td>
                         <td>Surat Jalan No.:<br><b>${esc(nomorSJ(inv.no_invoice))}</b></td>
                     </tr>
                 </table>
