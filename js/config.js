@@ -14,9 +14,10 @@ const MENU_TAB = {
     cetak_invoice: "tab-riwayat",
     stok_gudang: "tab-stok",
     report: "tab-report",
+    piutang: "tab-piutang",
     admin: "tab-admin"
 };
-const SEMUA_TAB = ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok", "tab-report", "tab-admin"];
+const SEMUA_TAB = ["tab-masuk", "tab-keluar", "tab-riwayat", "tab-stok", "tab-report", "tab-piutang", "tab-admin"];
 const PASSWORD_MIN_WEB = 8;       // server tetap mengecek ulang
 
 // keluar otomatis bila tidak ada aktivitas (nilai Sesi_Menit dikirim server saat login)
