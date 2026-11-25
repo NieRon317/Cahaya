@@ -4,6 +4,7 @@ FILE_VERSI["report"] = "v11";
 // ---------- report (admin) ----------
 let reportData = null;
 let reportBulananData = null;
+let reportTahunanData = null;
 let reportMode = "jual";      // "jual" = penjualan saja | "lain" = pemakaian, rusak, retur (tanpa penjualan)
 let reportUrut = "laris";
 let reportCari = "";
@@ -276,6 +277,7 @@ function siapkanPilihanBulanan() {
     let kini = hariIniWIB().split("-");
     pilih.value = String(Number(kini[1]));
     document.getElementById("bulanan-tahun").value = kini[0];
+    document.getElementById("tahunan-tahun").value = kini[0];
 }
 
 async function loadReportBulanan() {
@@ -290,6 +292,7 @@ async function loadReportBulanan() {
         let res = await kirimPost({ aksi: "report_bulanan", bulan, tahun });
         if (!sesi) return;
         if (res.status !== "success") { box.textContent = res.message || "Gagal memuat laporan."; return; }
+        if (!res.pembelian) { box.textContent = "Server belum memuat laporan pembelian. Pasang build terbaru."; return; }
         reportBulananData = res;
         box.innerHTML = htmlReportBulanan(res);
         document.getElementById("btn-cetak-bulanan").disabled = false;
@@ -298,23 +301,79 @@ async function loadReportBulanan() {
 
 function htmlReportBulanan(d) {
     let nama = tglCetak(d.bulan + "-01").replace(/^1 /, "");
+    let p = d.pembelian;
     let barisBarang = d.barang.map((b, i) => `<tr><td>${i + 1}</td><td>${esc(b.sku)}</td><td>${esc(b.nama)}</td><td class="num">${b.jumlah}</td><td>${esc(b.satuan)}</td><td class="num">${rp(b.total)}</td></tr>`).join("");
     let barisPelanggan = d.pelanggan.map((p, i) => `<tr><td>${i + 1}</td><td>${esc(p.nama)}</td><td class="num">${p.invoice}</td><td class="num">${rp(p.total)}</td></tr>`).join("");
     let barisInvoice = d.invoice.map((v, i) => `<tr><td>${i + 1}</td><td>${esc(tglCetak(v.tanggal))}</td><td>${esc(v.no_invoice)}</td><td>${esc(v.pelanggan)}</td><td class="num">${v.jumlah_item}</td><td class="num">${rp(v.total)}</td></tr>`).join("");
-    return `<div class="rp-doc"><div class="rp-head"><div><h1>${esc(NAMA_TOKO)}</h1><div class="sub">Laporan Penjualan Bulanan — ${esc(nama)}</div></div><div class="rp-meta">Data diperbarui: ${esc(d.diperbarui)} WIB</div></div>
+    let barisBeli = p.barang.map((b, i) => `<tr><td>${i + 1}</td><td>${esc(b.sku)}</td><td>${esc(b.nama)}</td><td class="num">${b.jumlah}</td><td>${esc(b.satuan)}</td><td class="num">${rp(b.total)}</td></tr>`).join("");
+    let barisPemasok = p.pemasok.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.nama)}</td><td class="num">${s.invoice}</td><td class="num">${rp(s.total)}</td></tr>`).join("");
+    let barisInvBeli = p.invoice.map((v, i) => `<tr><td>${i + 1}</td><td>${esc(tglCetak(v.tanggal))}</td><td>${esc(v.no_invoice)}</td><td>${esc(v.supplier)}</td><td class="num">${v.jumlah_item}</td><td class="num">${rp(v.total)}</td></tr>`).join("");
+    return `<div class="rp-doc"><div class="rp-head"><div><h1>${esc(NAMA_TOKO)}</h1><div class="sub">Laporan Penjualan &amp; Pembelian Bulanan — ${esc(nama)}</div></div><div class="rp-meta">Data diperbarui: ${esc(d.diperbarui)} WIB</div></div>
       ${d.berjalan ? '<p class="rp-info">Bulan berjalan: data sampai saat laporan dibuat.</p>' : ''}
+      <h2>Penjualan</h2>
       <table><tbody><tr><th>Total penjualan</th><td class="num">${rp(d.total)}</td><th>Jumlah invoice</th><td class="num">${d.jumlah_invoice}</td></tr>
       <tr><th>Jumlah pembeli</th><td class="num">${d.jumlah_pelanggan}</td><th>Rata-rata per invoice</th><td class="num">${rp(d.rata_invoice)}</td></tr>
       <tr><th>Jumlah barang terjual</th><td class="num">${d.jumlah_barang}</td><th>Jenis barang terjual</th><td class="num">${d.jenis_barang}</td></tr></tbody></table>
       <h2>Barang terjual</h2><table><thead><tr><th>No</th><th>SKU</th><th>Barang</th><th class="num">Jumlah</th><th>Satuan</th><th class="num">Nilai</th></tr></thead><tbody>${barisBarang || '<tr><td colspan="6">Tidak ada penjualan.</td></tr>'}</tbody></table>
       <h2>Pembeli</h2><table><thead><tr><th>No</th><th>Pembeli</th><th class="num">Invoice</th><th class="num">Total</th></tr></thead><tbody>${barisPelanggan || '<tr><td colspan="4">Tidak ada penjualan.</td></tr>'}</tbody></table>
-      <h2>Daftar invoice</h2><table><thead><tr><th>No</th><th>Tanggal</th><th>Nomor invoice</th><th>Pembeli</th><th class="num">Jumlah barang</th><th class="num">Total</th></tr></thead><tbody>${barisInvoice || '<tr><td colspan="6">Tidak ada penjualan.</td></tr>'}</tbody></table>
-      <p class="rp-info">Hanya invoice Penjualan aktif. Total penjualan berdasarkan tanggal invoice, termasuk yang belum dibayar.</p></div>`;
+      <h2>Daftar invoice penjualan</h2><table><thead><tr><th>No</th><th>Tanggal</th><th>Nomor invoice</th><th>Pembeli</th><th class="num">Jumlah barang</th><th class="num">Total</th></tr></thead><tbody>${barisInvoice || '<tr><td colspan="6">Tidak ada penjualan.</td></tr>'}</tbody></table>
+      <h2 class="baru-halaman">Pembelian</h2>
+      <table><tbody><tr><th>Total pembelian</th><td class="num">${rp(p.total)}</td><th>Jumlah invoice</th><td class="num">${p.jumlah_invoice}</td></tr>
+      <tr><th>Jumlah pemasok</th><td class="num">${p.jumlah_pemasok}</td><th>Jumlah barang dibeli</th><td class="num">${p.jumlah_barang}</td></tr>
+      <tr><th>Jenis barang dibeli</th><td class="num">${p.jenis_barang}</td><td colspan="2"></td></tr></tbody></table>
+      <h2>Barang dibeli</h2><table><thead><tr><th>No</th><th>SKU</th><th>Barang</th><th class="num">Jumlah</th><th>Satuan</th><th class="num">Nilai</th></tr></thead><tbody>${barisBeli || '<tr><td colspan="6">Tidak ada pembelian.</td></tr>'}</tbody></table>
+      <h2>Pemasok</h2><table><thead><tr><th>No</th><th>Pemasok</th><th class="num">Invoice</th><th class="num">Total</th></tr></thead><tbody>${barisPemasok || '<tr><td colspan="4">Tidak ada pembelian.</td></tr>'}</tbody></table>
+      <h2>Daftar invoice pembelian</h2><table><thead><tr><th>No</th><th>Tanggal</th><th>Nomor invoice</th><th>Pemasok</th><th class="num">Jumlah barang</th><th class="num">Total</th></tr></thead><tbody>${barisInvBeli || '<tr><td colspan="6">Tidak ada pembelian.</td></tr>'}</tbody></table>
+      <p class="rp-info">Hanya invoice aktif. Penjualan termasuk yang belum dibayar. Pembelian mencakup arsip lama${p.termasuk_stok_awal ? ', termasuk stok awal' : ''}; transaksi yang juga tercatat di invoice baru dihitung sekali. ${p.tanggal_pengganti ? 'Jika tanggal invoice pembelian kosong, dipakai tanggal input/arsip. ' : ''}Nilai penjualan dikurangi pembelian bukan laba.</p></div>`;
 }
 
 function cetakReportBulanan() {
     if (!reportBulananData) return;
     document.getElementById("invoice-isi").innerHTML = htmlReportBulanan(reportBulananData);
     document.title = "Laporan Bulanan " + reportBulananData.bulan;
+    document.getElementById("modal-invoice").style.display = "block";
+}
+
+async function loadReportTahunan() {
+    let tahun = Number(document.getElementById("tahunan-tahun").value);
+    let box = document.getElementById("tahunan-isi");
+    reportTahunanData = null;
+    document.getElementById("btn-cetak-tahunan").disabled = true;
+    box.textContent = "Menghitung laporan tahunan...";
+    try {
+        let res = await kirimPost({ aksi: "report_tahunan", tahun });
+        if (!sesi) return;
+        if (res.status !== "success") { box.textContent = res.message || "Gagal memuat laporan."; return; }
+        reportTahunanData = res;
+        box.innerHTML = htmlReportTahunan(res);
+        document.getElementById("btn-cetak-tahunan").disabled = false;
+    } catch (e) { box.textContent = "Gagal terhubung ke server."; }
+}
+
+function htmlReportTahunan(d) {
+    let j = d.penjualan, p = d.pembelian;
+    let baris = j.bulanan.map((m, i) => {
+        if (i >= d.bulan_sampai) return `<tr><td>${esc(BLN[i])}</td><td colspan="5">Belum berjalan</td></tr>`;
+        let bulan = BLN[i] + (d.tahun_berjalan && i === d.bulan_sampai - 1 ? " (berjalan)" : "");
+        return `<tr><td>${esc(bulan)}</td><td class="num">${rp(m.total)}</td><td class="num">${m.invoice}</td><td class="num">${m.jumlah_barang}</td><td class="num">${rp(p.bulanan[i].total)}</td><td class="num">${p.bulanan[i].invoice}</td></tr>`;
+    }).join("");
+    let topBarang = j.top_barang.map((b, i) => `<tr><td>${i + 1}</td><td>${esc(b.nama)}</td><td class="num">${b.jumlah}</td></tr>`).join("");
+    let topPelanggan = j.top_pelanggan.map((v, i) => `<tr><td>${i + 1}</td><td>${esc(v.nama)}</td><td class="num">${rp(v.total)}</td></tr>`).join("");
+    let cakupan = d.tahun_berjalan ? `Tahun ${d.tahun} berjalan: data sampai ${esc(tglCetak(d.tanggal_sampai))} WIB. Bulan sesudahnya belum berjalan.` :
+        `Data tahun ${d.tahun} menurut transaksi yang tercatat sampai ${esc(d.diperbarui)} WIB.`;
+    return `<div class="rp-doc"><div class="rp-head"><div><h1>${esc(NAMA_TOKO)}</h1><div class="sub">Laporan Penjualan &amp; Pembelian Tahunan — ${d.tahun}</div></div><div class="rp-meta">Dibuat: ${esc(d.diperbarui)} WIB</div></div>
+      <p class="rp-info">${cakupan} Angka 0 berarti tidak ada transaksi yang tercatat; data sebelum sistem aktif mungkin belum lengkap.</p>
+      <table><thead><tr><th>Bulan</th><th class="num">Penjualan</th><th class="num">Invoice jual</th><th class="num">Barang terjual</th><th class="num">Pembelian</th><th class="num">Invoice beli</th></tr></thead>
+      <tbody>${baris}<tr><th>Total tercatat</th><th class="num">${rp(j.total)}</th><th class="num">${j.jumlah_invoice}</th><th class="num">${j.jumlah_barang}</th><th class="num">${rp(p.total)}</th><th class="num">${p.jumlah_invoice}</th></tr></tbody></table>
+      <p><b>Customer yang berbelanja: ${j.jumlah_pelanggan}</b></p>
+      <h2>Top 10 barang terjual</h2><table><thead><tr><th>No</th><th>Barang</th><th class="num">Jumlah</th></tr></thead><tbody>${topBarang || '<tr><td colspan="3">Belum ada penjualan.</td></tr>'}</tbody></table>
+      <h2>Top 5 customer</h2><table><thead><tr><th>No</th><th>Customer</th><th class="num">Total belanja</th></tr></thead><tbody>${topPelanggan || '<tr><td colspan="3">Belum ada penjualan.</td></tr>'}</tbody></table>
+      <p class="rp-info">Penjualan hanya tipe Penjualan aktif. Pembelian termasuk ${p.termasuk_stok_awal ? 'stok awal dari arsip dan ' : ''}invoice masuk aktif; baris arsip yang juga ada di invoice baru dihitung sekali. Periode memakai tanggal invoice${p.tanggal_pengganti ? ', atau tanggal input/arsip jika tanggal invoice pembelian kosong' : ''}. Selisih penjualan dan pembelian bukan laba.</p></div>`;
+}
+
+function cetakReportTahunan() {
+    if (!reportTahunanData) return;
+    document.getElementById("invoice-isi").innerHTML = htmlReportTahunan(reportTahunanData);
+    document.title = "Laporan Tahunan " + reportTahunanData.tahun;
     document.getElementById("modal-invoice").style.display = "block";
 }
