@@ -127,8 +127,10 @@ function logout(pesan, tanpaServer) {
     document.getElementById("report-isi").innerHTML = "";
     reportData = null;
     reportBulananData = null;
+    reportTahunanData = null;
     piutangData = null;
     document.getElementById("bulanan-isi").innerHTML = "";
+    document.getElementById("tahunan-isi").innerHTML = "";
     document.getElementById("piutang-isi").innerHTML = "";
     document.getElementById("hasil-keluar").style.display = "none";
     document.getElementById("status-message").style.display = "none";
